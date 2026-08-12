@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "tekup",
-    "slug": "tekup",
+    "name": "kabe",
+    "slug": "kabe",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tekup",
+    "scheme": "kabe",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon"
