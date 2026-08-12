@@ -1,5 +1,6 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { CategoryItem } from '@/types/TracingTypes';
 
@@ -22,9 +23,22 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 }) => {
   const t = TRANSLATIONS[language];
   const colors = COLOR_THEMES[themeMode];
-  const isDarkCard = category.id === 'uploads';
 
-  // Translated category titles & subtitles
+  const isDarkCard = category.id === 'uploads';
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.96, { damping: 15, stiffness: 350 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 350 });
+  };
+
   const getCategoryTitle = () => {
     if (category.id === 'uploads') return t.myUploadsTitle;
     if (category.id === 'anime') return 'Anime & Chibi';
@@ -46,82 +60,86 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   const badgeText = category.id === 'uploads' ? t.myUploadsBadge : category.badgeText;
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.75}
-      onPress={() => onPress(category)}
-      style={[
-        styles.cardContainer,
-        {
-          minHeight: cardHeight,
-          backgroundColor: isDarkCard ? '#09090B' : colors.cardBackground,
-          borderColor: isDarkCard ? '#27272A' : colors.cardBorder,
-        },
-      ]}
-    >
-      <View style={styles.topSection}>
-        {badgeText ? (
+    <Animated.View style={animatedStyle}>
+      <Pressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={() => onPress(category)}
+        style={[
+          styles.cardContainer,
+          {
+            minHeight: cardHeight,
+            backgroundColor: isDarkCard ? '#09090B' : colors.cardBackground,
+            borderColor: isDarkCard ? '#27272A' : colors.cardBorder,
+            shadowColor: themeMode === 'dark' ? '#000000' : '#09090B',
+          },
+        ]}
+      >
+        <View style={styles.topSection}>
+          {badgeText ? (
+            <View
+              style={[
+                styles.badge,
+                {
+                  backgroundColor: isDarkCard ? '#27272A' : colors.buttonBackground,
+                  borderColor: isDarkCard ? '#3F3F46' : colors.buttonBorder,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.badgeText,
+                  { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+                ]}
+              >
+                {badgeText}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.badgeSpacer} />
+          )}
+
+          <Text
+            style={[
+              styles.titleText,
+              { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+            ]}
+          >
+            {getCategoryTitle()}
+          </Text>
+          <Text
+            style={[
+              styles.subtitleText,
+              { color: isDarkCard ? '#A1A1AA' : colors.textSecondary },
+            ]}
+            numberOfLines={2}
+          >
+            {getCategorySub()}
+          </Text>
+        </View>
+
+        {itemCount !== undefined && (
           <View
             style={[
-              styles.badge,
+              styles.countTag,
               {
-                backgroundColor: isDarkCard ? '#27272A' : colors.buttonBackground,
-                borderColor: isDarkCard ? '#3F3F46' : colors.buttonBorder,
+                backgroundColor: isDarkCard ? '#18181B' : colors.buttonBackground,
+                borderColor: isDarkCard ? '#27272A' : colors.buttonBorder,
               },
             ]}
           >
             <Text
               style={[
-                styles.badgeText,
+                styles.countText,
                 { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
               ]}
             >
-              {badgeText}
+              {itemCount} {t.imageCountUnit} →
             </Text>
           </View>
-        ) : (
-          <View style={styles.badgeSpacer} />
         )}
-
-        <Text
-          style={[
-            styles.titleText,
-            { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
-          ]}
-        >
-          {getCategoryTitle()}
-        </Text>
-        <Text
-          style={[
-            styles.subtitleText,
-            { color: isDarkCard ? '#A1A1AA' : colors.textSecondary },
-          ]}
-          numberOfLines={2}
-        >
-          {getCategorySub()}
-        </Text>
-      </View>
-
-      {itemCount !== undefined && (
-        <View
-          style={[
-            styles.countTag,
-            {
-              backgroundColor: isDarkCard ? '#18181B' : colors.buttonBackground,
-              borderColor: isDarkCard ? '#27272A' : colors.buttonBorder,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.countText,
-              { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
-            ]}
-          >
-            {itemCount} {t.imageCountUnit}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
+      </Pressable>
+    </Animated.View>
   );
 };
 
@@ -133,6 +151,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderWidth: 1,
     overflow: 'hidden',
+    // Premium soft drop shadow for interactive depth
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   topSection: {
     gap: 4,

@@ -1,5 +1,6 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { AppIcon } from '@/components/AppIcon';
 import { CategoryCard } from '@/components/CategoryCard';
 import { CATEGORIES } from '@/constants/PresetCategories';
@@ -26,7 +27,7 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
   language,
   themeMode,
 }) => {
-  const { columns, gap, paddingHorizontal, maxContainerWidth, cardHeight, isTablet } =
+  const { columns, gap, paddingHorizontal, maxContainerWidth, cardHeight } =
     useResponsiveLayout();
 
   const t = TRANSLATIONS[language];
@@ -38,94 +39,120 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
   };
 
   return (
-    <ScrollView
-      style={[styles.screenContainer, { backgroundColor: colors.background }]}
-      contentContainerStyle={[styles.scrollContent, { paddingHorizontal }]}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
-        {/* App Top Bar with Brand & Settings Icon */}
-        <View style={styles.topBar}>
-          <View style={styles.brandGroup}>
-            <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>Ketah Kabe</Text>
-          </View>
+    <View style={[styles.screenContainer, { backgroundColor: colors.background }]}>
+      {/* Sticky Top Header Bar */}
+      <Animated.View
+        entering={FadeInDown.duration(350)}
+        style={[
+          styles.stickyHeader,
+          {
+            backgroundColor: colors.background,
+            borderBottomColor: colors.cardBorder,
+          },
+        ]}
+      >
+        <View style={[styles.stickyHeaderContent, { maxWidth: maxContainerWidth, paddingHorizontal }]}>
+          <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>Ketah Kabe</Text>
 
-          <TouchableOpacity
-            style={[
-              styles.settingsIconBtn,
-              { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
-            ]}
-            onPress={onOpenSettingsModal}
-          >
-            <AppIcon name="settings" size={16} color={colors.textPrimary} />
-          </TouchableOpacity>
+          <Pressable style={styles.flatSettingsIconBtn} onPress={onOpenSettingsModal}>
+            <AppIcon name="settings" size={18} color={colors.textPrimary} />
+          </Pressable>
         </View>
+      </Animated.View>
 
-        {/* App Hero / Header Banner */}
-        <View
-          style={[
-            styles.heroCard,
-            { backgroundColor: colors.heroCardBackground, borderColor: colors.cardBorder },
-            isTablet && styles.heroCardTablet,
-          ]}
-        >
-          <View style={styles.heroTextGroup}>
-            <View style={styles.appBadge}>
-              <Text style={styles.appBadgeText}>{t.appTag}</Text>
-            </View>
-            <Text style={[styles.heroTitle, isTablet && styles.heroTitleTablet]}>
+      {/* Main Scrollable Content */}
+      <ScrollView
+        style={styles.scrollArea}
+        contentContainerStyle={[styles.scrollContent, { paddingHorizontal }]}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
+          {/* Animated Flat Editorial Hero Header */}
+          <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.flatHeroSection}>
+            <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>
               {t.heroTitle}
             </Text>
-            <Text style={styles.heroSub}>{t.heroSub}</Text>
+            <Text style={[styles.heroSub, { color: colors.textSecondary }]}>
+              {t.heroSub}
+            </Text>
+
+            <Pressable
+              style={[styles.uploadHeaderBtn, { backgroundColor: colors.darkButtonBackground }]}
+              onPress={onOpenUploadModal}
+            >
+              <AppIcon name="plus" size={14} color={colors.darkButtonText} />
+              <Text style={[styles.uploadHeaderText, { color: colors.darkButtonText }]}>
+                {t.uploadButton}
+              </Text>
+            </Pressable>
+          </Animated.View>
+
+          {/* Section Heading */}
+          <Animated.View entering={FadeInDown.delay(180).duration(450)} style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+              {t.categoryTitle}
+            </Text>
+            <Text style={[styles.sectionSub, { color: colors.textSecondary }]}>
+              {t.categorySub}
+            </Text>
+          </Animated.View>
+
+          {/* Dynamic Flat Category Grid */}
+          <View style={[styles.gridContainer, { gap }]}>
+            {CATEGORIES.map((cat, index) => {
+              const itemCount = getCategoryCount(cat.id);
+              const columnWidth = `${100 / columns - (gap * (columns - 1)) / columns}%` as any;
+
+              return (
+                <Animated.View
+                  key={cat.id}
+                  entering={FadeInUp.delay(220 + index * 50).springify().damping(16)}
+                  style={{ width: columnWidth }}
+                >
+                  <CategoryCard
+                    category={cat}
+                    itemCount={itemCount}
+                    onPress={onSelectCategory}
+                    cardHeight={cardHeight}
+                    language={language}
+                    themeMode={themeMode}
+                  />
+                </Animated.View>
+              );
+            })}
           </View>
-
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.uploadHeaderBtn}
-            onPress={onOpenUploadModal}
-          >
-            <AppIcon name="plus" size={14} color="#09090B" />
-            <Text style={styles.uploadHeaderText}>{t.uploadButton}</Text>
-          </TouchableOpacity>
         </View>
-
-        {/* Section Heading */}
-        <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-            {t.categoryTitle}
-          </Text>
-          <Text style={[styles.sectionSub, { color: colors.textSecondary }]}>
-            {t.categorySub}
-          </Text>
-        </View>
-
-        {/* Dynamic Category Grid */}
-        <View style={[styles.gridContainer, { gap }]}>
-          {CATEGORIES.map((cat) => {
-            const itemCount = getCategoryCount(cat.id);
-            const columnWidth = `${100 / columns - (gap * (columns - 1)) / columns}%` as any;
-
-            return (
-              <View key={cat.id} style={{ width: columnWidth }}>
-                <CategoryCard
-                  category={cat}
-                  itemCount={itemCount}
-                  onPress={onSelectCategory}
-                  cardHeight={cardHeight}
-                  language={language}
-                  themeMode={themeMode}
-                />
-              </View>
-            );
-          })}
-        </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   screenContainer: {
+    flex: 1,
+  },
+  stickyHeader: {
+    height: 56,
+    borderBottomWidth: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 100,
+  },
+  stickyHeaderContent: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brandTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  flatSettingsIconBtn: {
+    padding: 6,
+  },
+  scrollArea: {
     flex: 1,
   },
   scrollContent: {
@@ -134,92 +161,43 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     width: '100%',
-    gap: 20,
+    gap: 24,
   },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  brandGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  brandTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    letterSpacing: -0.5,
-  },
-  settingsIconBtn: {
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  heroCard: {
-    borderRadius: 16,
-    padding: 24,
-    gap: 16,
-    borderWidth: 1,
-  },
-  heroCardTablet: {
-    padding: 32,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  heroTextGroup: {
-    flex: 1,
-    gap: 8,
-  },
-  appBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#27272A',
-    borderWidth: 1,
-    borderColor: '#3F3F46',
-    paddingHorizontal: 10,
+  flatHeroSection: {
+    gap: 10,
     paddingVertical: 4,
-    borderRadius: 6,
-  },
-  appBadgeText: {
-    color: '#A1A1AA',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1,
   },
   heroTitle: {
-    color: '#FFFFFF',
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '900',
-    letterSpacing: -0.5,
-  },
-  heroTitleTablet: {
-    fontSize: 30,
+    letterSpacing: -0.8,
+    lineHeight: 34,
   },
   heroSub: {
-    color: '#A1A1AA',
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 20,
     fontWeight: '400',
     maxWidth: 550,
   },
   uploadHeaderBtn: {
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderRadius: 10,
-    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 4,
   },
   uploadHeaderText: {
-    color: '#09090B',
     fontSize: 13,
     fontWeight: '800',
   },
   sectionHeader: {
     gap: 2,
+    borderTopWidth: 1,
+    borderTopColor: '#E4E4E7',
+    paddingTop: 16,
   },
   sectionTitle: {
     fontSize: 18,

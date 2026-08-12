@@ -35,17 +35,12 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
     <View
       style={[
         styles.container,
-        { backgroundColor: colors.cardBackground, borderBottomColor: colors.cardBorder },
+        { backgroundColor: colors.background, borderBottomColor: colors.cardBorder },
       ]}
     >
-      <TouchableOpacity
-        style={[
-          styles.iconButton,
-          { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
-        ]}
-        onPress={onBack}
-      >
-        <AppIcon name="arrow-left" size={14} color={colors.textPrimary} />
+      {/* Flat Back Button (No Grey Box!) */}
+      <TouchableOpacity style={styles.flatIconButton} onPress={onBack}>
+        <AppIcon name="arrow-left" size={16} color={colors.textPrimary} />
         <Text style={[styles.backText, { color: colors.textPrimary }]}>{t.back}</Text>
       </TouchableOpacity>
 
@@ -55,25 +50,13 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
 
       <View style={styles.rightActions}>
         {onOpenSettingsModal && (
-          <TouchableOpacity
-            style={[
-              styles.resetButton,
-              { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
-            ]}
-            onPress={onOpenSettingsModal}
-          >
-            <AppIcon name="settings" size={13} color={colors.textPrimary} />
+          <TouchableOpacity style={styles.flatIconBtnOnly} onPress={onOpenSettingsModal}>
+            <AppIcon name="settings" size={16} color={colors.textPrimary} />
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity
-          style={[
-            styles.resetButton,
-            { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
-          ]}
-          onPress={onReset}
-        >
-          <AppIcon name="reset" size={12} color={colors.textPrimary} />
+        <TouchableOpacity style={styles.flatTextBtn} onPress={onReset}>
+          <AppIcon name="reset" size={14} color={colors.textPrimary} />
           <Text style={[styles.resetText, { color: colors.textPrimary }]}>{t.reset}</Text>
         </TouchableOpacity>
 
@@ -96,21 +79,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     gap: 8,
     zIndex: 100,
   },
-  iconButton: {
+  flatIconButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingVertical: 7,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingVertical: 8,
+    paddingRight: 8,
   },
   backText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
   },
   title: {
@@ -123,27 +104,28 @@ const styles = StyleSheet.create({
   rightActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 12,
   },
-  resetButton: {
+  flatIconBtnOnly: {
+    padding: 6,
+  },
+  flatTextBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 8,
-    borderWidth: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
   },
   resetText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
   },
   lockButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 8,
   },
   lockText: {

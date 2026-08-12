@@ -1,5 +1,6 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { AppIcon } from '@/components/AppIcon';
 import { ImageGridCard } from '@/components/ImageGridCard';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
@@ -45,22 +46,17 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
   return (
     <View style={[styles.screenContainer, { backgroundColor: colors.background }]}>
       {/* Top Navbar */}
-      <View
+      <Animated.View
+        entering={FadeInDown.duration(350)}
         style={[
           styles.topNav,
-          { backgroundColor: colors.cardBackground, borderBottomColor: colors.cardBorder },
+          { backgroundColor: colors.background, borderBottomColor: colors.cardBorder },
         ]}
       >
-        <TouchableOpacity
-          style={[
-            styles.backBtn,
-            { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
-          ]}
-          onPress={onBack}
-        >
-          <AppIcon name="arrow-left" size={14} color={colors.textPrimary} />
+        <Pressable style={styles.flatBackBtn} onPress={onBack}>
+          <AppIcon name="arrow-left" size={16} color={colors.textPrimary} />
           <Text style={[styles.backText, { color: colors.textPrimary }]}>{t.backToCategories}</Text>
-        </TouchableOpacity>
+        </Pressable>
 
         <View style={styles.categoryTitleGroup}>
           <Text style={[styles.categoryTitle, { color: colors.textPrimary }]}>
@@ -72,22 +68,21 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
         </View>
 
         <View style={styles.rightNavActions}>
-          <TouchableOpacity
-            style={[
-              styles.settingsBtn,
-              { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
-            ]}
-            onPress={onOpenSettingsModal}
-          >
-            <AppIcon name="settings" size={14} color={colors.textPrimary} />
-          </TouchableOpacity>
+          <Pressable style={styles.flatSettingsBtn} onPress={onOpenSettingsModal}>
+            <AppIcon name="settings" size={18} color={colors.textPrimary} />
+          </Pressable>
 
-          <TouchableOpacity style={styles.uploadBtn} onPress={onOpenUploadModal}>
-            <AppIcon name="plus" size={14} color="#FFFFFF" />
-            <Text style={styles.uploadText}>{t.uploadButton}</Text>
-          </TouchableOpacity>
+          <Pressable
+            style={[styles.uploadBtn, { backgroundColor: colors.darkButtonBackground }]}
+            onPress={onOpenUploadModal}
+          >
+            <AppIcon name="plus" size={14} color={colors.darkButtonText} />
+            <Text style={[styles.uploadText, { color: colors.darkButtonText }]}>
+              {t.uploadButton}
+            </Text>
+          </Pressable>
         </View>
-      </View>
+      </Animated.View>
 
       {/* Main Content */}
       <ScrollView
@@ -96,7 +91,7 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
       >
         <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
           {images.length === 0 ? (
-            <View style={styles.emptyContainer}>
+            <Animated.View entering={FadeInUp.duration(400)} style={styles.emptyContainer}>
               <AppIcon name="image" size={40} color={colors.textSecondary} />
               <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
                 {t.noImagesTitle}
@@ -104,24 +99,33 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
               <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
                 {t.noImagesSub}
               </Text>
-              <TouchableOpacity style={styles.emptyUploadBtn} onPress={onOpenUploadModal}>
-                <AppIcon name="plus" size={14} color="#FFFFFF" />
-                <Text style={styles.emptyUploadText}>{t.uploadNow}</Text>
-              </TouchableOpacity>
-            </View>
+              <Pressable
+                style={[styles.emptyUploadBtn, { backgroundColor: colors.darkButtonBackground }]}
+                onPress={onOpenUploadModal}
+              >
+                <AppIcon name="plus" size={14} color={colors.darkButtonText} />
+                <Text style={[styles.emptyUploadText, { color: colors.darkButtonText }]}>
+                  {t.uploadNow}
+                </Text>
+              </Pressable>
+            </Animated.View>
           ) : (
             <View style={[styles.gridContainer, { gap }]}>
-              {images.map((img) => {
+              {images.map((img, index) => {
                 const columnWidth = `${100 / columns - (gap * (columns - 1)) / columns}%` as any;
                 return (
-                  <View key={img.id} style={{ width: columnWidth }}>
+                  <Animated.View
+                    key={img.id}
+                    entering={FadeInUp.delay(100 + index * 50).springify().damping(15)}
+                    style={{ width: columnWidth }}
+                  >
                     <ImageGridCard
                       image={img}
                       onSelect={onSelectImage}
                       onDelete={onDeleteImage}
                       themeMode={themeMode}
                     />
-                  </View>
+                  </Animated.View>
                 );
               })}
             </View>
@@ -145,17 +149,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     zIndex: 10,
   },
-  backBtn: {
+  flatBackBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    borderWidth: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingRight: 8,
   },
   backText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
   },
   categoryTitleGroup: {
@@ -172,24 +174,20 @@ const styles = StyleSheet.create({
   rightNavActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 12,
   },
-  settingsBtn: {
-    padding: 7,
-    borderRadius: 8,
-    borderWidth: 1,
+  flatSettingsBtn: {
+    padding: 6,
   },
   uploadBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#09090B',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 8,
   },
   uploadText: {
-    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '800',
   },
@@ -225,13 +223,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#09090B',
     paddingHorizontal: 18,
     paddingVertical: 10,
     borderRadius: 10,
   },
   emptyUploadText: {
-    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '800',
   },
