@@ -39,11 +39,9 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isSelected, setIsSelected] = useState(true);
 
-  // Store initial touch values for pinch zoom & resize handles
   const initialPinchDist = useRef<number | null>(null);
   const initialScale = useRef<number>(1.0);
-  const initialHandleScale = useRef<number>(1.0);
-  const initialTouchY = useRef<number>(0);
+  const handleStartScale = useRef<number>(1.0);
 
   const handleUpdateConfig = (newPartial: Partial<TracingStudioConfig>) => {
     setConfig((prev) => ({ ...prev, ...newPartial }));
@@ -55,18 +53,17 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
     setIsSelected(true);
   };
 
-  // Distance helper for pinch gesture
   const getDistance = (touches: any[]) => {
     const dx = touches[0].pageX - touches[1].pageX;
     const dy = touches[0].pageY - touches[1].pageY;
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-  // Main Image Pan & Pinch Gesture Responder
+  // Main Image Pan & Pinch Responder
   const imagePanResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => !config.isLocked,
     onMoveShouldSetPanResponder: () => !config.isLocked,
-    onPanResponderGrant: (evt, gestureState) => {
+    onPanResponderGrant: (evt) => {
       if (config.isLocked) return;
       setIsSelected(true);
       if (evt.nativeEvent.touches.length === 2) {
@@ -77,16 +74,16 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
     onPanResponderMove: (evt, gestureState) => {
       if (config.isLocked) return;
 
-      // Handle 2-finger pinch to zoom
+      // Handle 2-finger pinch
       if (evt.nativeEvent.touches.length === 2 && initialPinchDist.current) {
         const currentDist = getDistance(evt.nativeEvent.touches);
         const factor = currentDist / initialPinchDist.current;
-        const newScale = Math.min(5.0, Math.max(0.3, initialScale.current * factor));
+        const newScale = Math.min(5.0, Math.max(0.2, initialScale.current * factor));
         setConfig((prev) => ({ ...prev, scale: newScale }));
         return;
       }
 
-      // Handle 1-finger pan/drag position
+      // Handle 1-finger pan/drag
       if (evt.nativeEvent.touches.length === 1) {
         setConfig((prev) => ({
           ...prev,
@@ -107,26 +104,41 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
     },
   });
 
-  // Corner Resize Handle Drag Responder (Figma/Canva style)
-  const resizeHandlePanResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => !config.isLocked,
-    onMoveShouldSetPanResponder: () => !config.isLocked,
-    onPanResponderGrant: (evt) => {
-      if (config.isLocked) return;
-      initialHandleScale.current = config.scale;
-      initialTouchY.current = evt.nativeEvent.pageY;
-    },
-    onPanResponderMove: (evt, gestureState) => {
-      if (config.isLocked) return;
-      // Calculate drag distance along diagonal to scale image up or down
-      const delta = (gestureState.dx + gestureState.dy) / 150;
-      const newScale = Math.min(5.0, Math.max(0.3, initialHandleScale.current + delta));
-      setConfig((prev) => ({ ...prev, scale: newScale }));
-    },
-    onPanResponderRelease: () => {
-      initialHandleScale.current = config.scale;
-    },
-  });
+  // Dedicated Corner Resize Handle PanResponder for scaling
+  const createCornerResizeResponder = (cornerMultiplier: { x: number; y: number }) => {
+    return PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponderCapture: () => true,
+      onPanResponderGrant: () => {
+        handleStartScale.current = config.scale;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        // Compute delta based on corner drag direction
+        const delta =
+          (gestureState.dx * cornerMultiplier.x + gestureState.dy * cornerMultiplier.y) / 120;
+        const newScale = Math.min(6.0, Math.max(0.2, handleStartScale.current + delta));
+        setConfig((prev) => ({ ...prev, scale: newScale }));
+      },
+      onPanResponderRelease: () => {
+        handleStartScale.current = config.scale;
+      },
+    });
+  };
+
+  const bottomRightResponder = useRef(
+    createCornerResizeResponder({ x: 1, y: 1 })
+  ).current;
+  const topLeftResponder = useRef(
+    createCornerResizeResponder({ x: -1, y: -1 })
+  ).current;
+  const topRightResponder = useRef(
+    createCornerResizeResponder({ x: 1, y: -1 })
+  ).current;
+  const bottomLeftResponder = useRef(
+    createCornerResizeResponder({ x: -1, y: 1 })
+  ).current;
 
   const getImageFilterStyles = () => {
     let opacity = config.opacity;
@@ -136,9 +148,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
       opacity = 0.95;
     }
 
-    return {
-      opacity,
-    };
+    return { opacity };
   };
 
   return (
@@ -163,6 +173,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
             { backgroundColor: config.filterMode === 'invert' ? '#000000' : '#FFFFFF' },
           ]}
         >
+          {/* Transform Container */}
           <View
             style={[
               styles.imageTransformWrapper,
@@ -177,52 +188,63 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
                 ],
               },
             ]}
-            {...imagePanResponder.panHandlers}
           >
-            {/* Image Container with Selection Bounding Box */}
+            {/* Image Box */}
             <View
               style={[
                 styles.imageBox,
                 isSelected && !config.isLocked && styles.selectedBoundingBox,
               ]}
+              {...imagePanResponder.panHandlers}
             >
               <Image
                 source={{ uri: image.uri }}
                 style={[styles.canvasImage, getImageFilterStyles()]}
                 resizeMode="contain"
               />
-
-              {/* Transform Bounding Box Handles (Shown when selected & unlocked) */}
-              {isSelected && !config.isLocked && (
-                <>
-                  {/* Top Rotation Knob */}
-                  <View style={styles.rotateHandleKnob} pointerEvents="box-none">
-                    <View style={styles.rotateHandleCircle} />
-                  </View>
-
-                  {/* 4 Corner Resize Handles */}
-                  <View
-                    style={[styles.cornerHandle, styles.topLeftHandle]}
-                    {...resizeHandlePanResponder.panHandlers}
-                  />
-                  <View
-                    style={[styles.cornerHandle, styles.topRightHandle]}
-                    {...resizeHandlePanResponder.panHandlers}
-                  />
-                  <View
-                    style={[styles.cornerHandle, styles.bottomLeftHandle]}
-                    {...resizeHandlePanResponder.panHandlers}
-                  />
-                  <View
-                    style={[styles.cornerHandle, styles.bottomRightHandle]}
-                    {...resizeHandlePanResponder.panHandlers}
-                  />
-                </>
-              )}
             </View>
+
+            {/* Transform Handles - Positioned outside imageBox to receive direct touches */}
+            {isSelected && !config.isLocked && (
+              <>
+                {/* Top Rotation Handle */}
+                <View style={styles.rotateHandleKnob} pointerEvents="none">
+                  <View style={styles.rotateHandleCircle} />
+                </View>
+
+                {/* 4 Corner Touch Target Handles (44x44px touch area) */}
+                <View
+                  style={[styles.cornerTouchArea, styles.topLeftTouch]}
+                  {...topLeftResponder.panHandlers}
+                >
+                  <View style={styles.cornerHandleDot} />
+                </View>
+
+                <View
+                  style={[styles.cornerTouchArea, styles.topRightTouch]}
+                  {...topRightResponder.panHandlers}
+                >
+                  <View style={styles.cornerHandleDot} />
+                </View>
+
+                <View
+                  style={[styles.cornerTouchArea, styles.bottomLeftTouch]}
+                  {...bottomLeftResponder.panHandlers}
+                >
+                  <View style={styles.cornerHandleDot} />
+                </View>
+
+                <View
+                  style={[styles.cornerTouchArea, styles.bottomRightTouch]}
+                  {...bottomRightResponder.panHandlers}
+                >
+                  <View style={styles.cornerHandleDot} />
+                </View>
+              </>
+            )}
           </View>
 
-          {/* Canvas Floating Quick "🔒 Lock Screen" Button (Wireframe Feature!) */}
+          {/* Canvas Floating Quick "🔒 Lock Screen" Button */}
           {!config.isLocked && (
             <TouchableOpacity
               activeOpacity={0.8}
@@ -237,7 +259,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
             </TouchableOpacity>
           )}
 
-          {/* High Brightness / Tracing Lightbox Overlay Simulation */}
+          {/* High Brightness / Tracing Lightbox Overlay */}
           <View
             style={[
               styles.lightboxFilter,
@@ -279,10 +301,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   imageTransformWrapper: {
-    width: '85%',
-    height: '80%',
+    width: '80%',
+    height: '75%',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   imageBox: {
     width: '100%',
@@ -314,31 +337,43 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#3B82F6',
   },
-  cornerHandle: {
+  // Corner Touch Target Areas (44x44px for easy finger drag)
+  cornerTouchArea: {
     position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 99,
+  },
+  cornerHandleDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#FFFFFF',
-    borderWidth: 2,
+    borderWidth: 2.5,
     borderColor: '#3B82F6',
-    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 4,
   },
-  topLeftHandle: {
-    top: -8,
-    left: -8,
+  topLeftTouch: {
+    top: -22,
+    left: -22,
   },
-  topRightHandle: {
-    top: -8,
-    right: -8,
+  topRightTouch: {
+    top: -22,
+    right: -22,
   },
-  bottomLeftHandle: {
-    bottom: -8,
-    left: -8,
+  bottomLeftTouch: {
+    bottom: -22,
+    left: -22,
   },
-  bottomRightHandle: {
-    bottom: -8,
-    right: -8,
+  bottomRightTouch: {
+    bottom: -22,
+    right: -22,
   },
   floatingCanvasLockButton: {
     position: 'absolute',

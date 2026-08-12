@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 interface UploadImageModalProps {
   visible: boolean;
@@ -25,6 +26,30 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
   const [urlInput, setUrlInput] = useState('');
   const [useUrl, setUseUrl] = useState(false);
 
+  // Native Image Picker (iOS & Android Photo Gallery)
+  const handlePickFromGallery = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        alert('Kebenaran galeri diperlukan untuk memilih gambar dari peranti anda.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.9,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        setSelectedUri(result.assets[0].uri);
+      }
+    } catch (e) {
+      console.warn('Error launching image picker:', e);
+    }
+  };
+
+  // Web File Picker Fallback
   const handleWebFileChange = (e: any) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -43,7 +68,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
     const finalTitle = title.trim() || 'Lukisan Saya';
 
     if (!finalUri) {
-      alert('Sila pilih gambar atau masukkan URL gambar!');
+      alert('Sila pilih gambar dari galeri peranti!');
       return;
     }
 
@@ -62,7 +87,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
         <View style={styles.modalCard}>
           <Text style={styles.modalTitle}>Muat Naik Gambar Baru</Text>
           <Text style={styles.modalSub}>
-            Pilih gambar dari peranti untuk dijadikan corak tekap lukisan.
+            Pilih gambar dari galeri peranti untuk dijadikan corak tekap lukisan.
           </Text>
 
           <View style={styles.inputGroup}>
@@ -82,7 +107,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
               onPress={() => setUseUrl(false)}
             >
               <Text style={[styles.toggleText, !useUrl && styles.toggleTextActive]}>
-                Fail Peranti
+                🖼️ Galeri Peranti
               </Text>
             </TouchableOpacity>
 
@@ -91,7 +116,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
               onPress={() => setUseUrl(true)}
             >
               <Text style={[styles.toggleText, useUrl && styles.toggleTextActive]}>
-                URL Gambar
+                🔗 URL Gambar
               </Text>
             </TouchableOpacity>
           </View>
@@ -100,7 +125,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
             <View style={styles.pickerBox}>
               {selectedUri ? (
                 <View style={styles.previewContainer}>
-                  <Text style={styles.previewTag}>✓ Gambar Dipilih</Text>
+                  <Text style={styles.previewTag}>✓ Gambar Dipilih Dari Galeri</Text>
                   <TouchableOpacity
                     style={styles.repickBtn}
                     onPress={() => setSelectedUri(null)}
@@ -123,7 +148,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
                         display: 'inline-block',
                       } as any}
                     >
-                      <span>📂 Pilih Fail Gambar</span>
+                      <span>📂 Buka Galeri Gambar</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -134,11 +159,9 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
                   ) : (
                     <TouchableOpacity
                       style={styles.pickImageBtn}
-                      onPress={() => {
-                        setUseUrl(true);
-                      }}
+                      onPress={handlePickFromGallery}
                     >
-                      <Text style={styles.pickImageText}>📂 Masukkan URL Gambar</Text>
+                      <Text style={styles.pickImageText}>📂 Buka Galeri Gambar</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -263,7 +286,7 @@ const styles = StyleSheet.create({
   pickImageBtn: {
     backgroundColor: '#09090B',
     paddingHorizontal: 16,
-    paddingVertical: 9,
+    paddingVertical: 10,
     borderRadius: 8,
   },
   pickImageText: {
