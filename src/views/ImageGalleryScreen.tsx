@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppIcon } from '@/components/AppIcon';
 import { ImageGridCard } from '@/components/ImageGridCard';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
@@ -28,7 +29,7 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
       {/* Top Navbar */}
       <View style={styles.topNav}>
         <TouchableOpacity style={styles.backBtn} onPress={onBack}>
-          <Text style={styles.backArrow}>←</Text>
+          <AppIcon name="arrow-left" size={14} color="#09090B" />
           <Text style={styles.backText}>Kategori</Text>
         </TouchableOpacity>
 
@@ -38,7 +39,8 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
         </View>
 
         <TouchableOpacity style={styles.uploadBtn} onPress={onOpenUploadModal}>
-          <Text style={styles.uploadText}>+ Upload</Text>
+          <AppIcon name="plus" size={14} color="#FFFFFF" />
+          <Text style={styles.uploadText}>Upload</Text>
         </TouchableOpacity>
       </View>
 
@@ -50,13 +52,14 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
         <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
           {images.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>🖼️</Text>
+              <AppIcon name="image" size={40} color="#A1A1AA" />
               <Text style={styles.emptyTitle}>Tiada Gambar Dalam Kategori Ini</Text>
               <Text style={styles.emptySub}>
                 Muat naik gambar pertama anda untuk mula menekap & melukis.
               </Text>
               <TouchableOpacity style={styles.emptyUploadBtn} onPress={onOpenUploadModal}>
-                <Text style={styles.emptyUploadText}>+ Muat Naik Gambar Sekarang</Text>
+                <AppIcon name="plus" size={14} color="#FFFFFF" />
+                <Text style={styles.emptyUploadText}>Muat Naik Gambar Sekarang</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -100,18 +103,13 @@ const styles = StyleSheet.create({
   backBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
     backgroundColor: '#F4F4F5',
     borderWidth: 1,
     borderColor: '#E4E4E7',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
-  },
-  backArrow: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#09090B',
   },
   backText: {
     fontSize: 12,
@@ -132,6 +130,9 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   uploadBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: '#09090B',
     paddingHorizontal: 12,
     paddingVertical: 7,
@@ -160,9 +161,6 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
     gap: 12,
   },
-  emptyIcon: {
-    fontSize: 40,
-  },
   emptyTitle: {
     fontSize: 16,
     fontWeight: '800',
@@ -176,6 +174,9 @@ const styles = StyleSheet.create({
   },
   emptyUploadBtn: {
     marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: '#09090B',
     paddingHorizontal: 18,
     paddingVertical: 10,

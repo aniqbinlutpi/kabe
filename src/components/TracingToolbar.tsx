@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppIcon } from '@/components/AppIcon';
 import { FilterMode, TracingStudioConfig } from '@/types/TracingTypes';
 
 interface TracingToolbarProps {
@@ -32,14 +33,14 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={styles.toolBtn}
-              onPress={() => onChangeConfig({ scale: Math.max(0.3, config.scale - 0.2) })}
+              onPress={() => onChangeConfig({ scale: Math.max(0.2, config.scale - 0.2) })}
             >
               <Text style={styles.toolBtnText}>−</Text>
             </TouchableOpacity>
             <Text style={styles.valueText}>{Math.round(config.scale * 100)}%</Text>
             <TouchableOpacity
               style={styles.toolBtn}
-              onPress={() => onChangeConfig({ scale: Math.min(5, config.scale + 0.2) })}
+              onPress={() => onChangeConfig({ scale: Math.min(6.0, config.scale + 0.2) })}
             >
               <Text style={styles.toolBtnText}>+</Text>
             </TouchableOpacity>
@@ -54,14 +55,22 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
               style={styles.toolBtn}
               onPress={() => onChangeConfig({ rotation: (config.rotation + 90) % 360 })}
             >
-              <Text style={styles.toolBtnText}>↻ 90°</Text>
+              <AppIcon name="reset" size={12} color="#09090B" />
+              <Text style={styles.toolBtnText}> 90°</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.toolBtn, config.flipHorizontal && styles.activeBtn]}
               onPress={() => onChangeConfig({ flipHorizontal: !config.flipHorizontal })}
             >
-              <Text style={[styles.toolBtnText, config.flipHorizontal && styles.activeBtnText]}>↔ Flip</Text>
+              <AppIcon
+                name="flip"
+                size={12}
+                color={config.flipHorizontal ? '#FFFFFF' : '#09090B'}
+              />
+              <Text style={[styles.toolBtnText, config.flipHorizontal && styles.activeBtnText]}>
+                Flip
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -74,14 +83,14 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
               style={styles.toolBtn}
               onPress={() => onChangeConfig({ brightness: Math.max(0.3, config.brightness - 0.2) })}
             >
-              <Text style={styles.toolBtnText}>🌙</Text>
+              <AppIcon name="moon" size={13} color="#09090B" />
             </TouchableOpacity>
             <Text style={styles.valueText}>{Math.round(config.brightness * 100)}%</Text>
             <TouchableOpacity
               style={styles.toolBtn}
               onPress={() => onChangeConfig({ brightness: Math.min(2.0, config.brightness + 0.2) })}
             >
-              <Text style={styles.toolBtnText}>☀️</Text>
+              <AppIcon name="sun" size={13} color="#09090B" />
             </TouchableOpacity>
           </View>
         </View>
@@ -138,15 +147,17 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   toolBtn: {
+    flexDirection: 'row',
     backgroundColor: '#F4F4F5',
     borderWidth: 1,
     borderColor: '#E4E4E7',
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 8,
     minWidth: 38,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 4,
   },
   toolBtnText: {
     fontSize: 12,

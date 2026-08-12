@@ -1,5 +1,6 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppIcon } from '@/components/AppIcon';
 import { CategoryCard } from '@/components/CategoryCard';
 import { CATEGORIES } from '@/constants/PresetCategories';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
@@ -55,7 +56,8 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
             style={styles.uploadHeaderBtn}
             onPress={onOpenUploadModal}
           >
-            <Text style={styles.uploadHeaderText}>+ Upload Gambar</Text>
+            <AppIcon name="plus" size={14} color="#09090B" />
+            <Text style={styles.uploadHeaderText}>Upload Gambar</Text>
           </TouchableOpacity>
         </View>
 
@@ -151,11 +153,13 @@ const styles = StyleSheet.create({
     maxWidth: 550,
   },
   uploadHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 10,
-    alignItems: 'center',
     justifyContent: 'center',
   },
   uploadHeaderText: {

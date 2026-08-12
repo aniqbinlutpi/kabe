@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppIcon } from '@/components/AppIcon';
 import { TracingImage } from '@/types/TracingTypes';
 
 interface ImageGridCardProps {
@@ -40,7 +41,7 @@ export const ImageGridCard: React.FC<ImageGridCardProps> = ({
               onDelete(image.id);
             }}
           >
-            <Text style={styles.deleteText}>✕</Text>
+            <AppIcon name="close" size={10} color="#FFFFFF" />
           </TouchableOpacity>
         )}
       </View>
@@ -100,11 +101,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#27272A',
-  },
-  deleteText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   infoArea: {
     padding: 10,

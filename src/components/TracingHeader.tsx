@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AppIcon } from '@/components/AppIcon';
 
 interface TracingHeaderProps {
   title: string;
@@ -23,7 +24,7 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.iconButton} onPress={onBack}>
-        <Text style={styles.backArrow}>←</Text>
+        <AppIcon name="arrow-left" size={14} color="#09090B" />
         <Text style={styles.backText}>Kembali</Text>
       </TouchableOpacity>
 
@@ -33,11 +34,12 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
 
       <View style={styles.rightActions}>
         <TouchableOpacity style={styles.resetButton} onPress={onReset}>
-          <Text style={styles.resetText}>↻ Reset</Text>
+          <AppIcon name="reset" size={12} color="#09090B" />
+          <Text style={styles.resetText}>Reset</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.lockButton} onPress={onToggleLock}>
-          <Text style={styles.lockIcon}>🔒</Text>
+          <AppIcon name="lock" size={12} color="#FFFFFF" />
           <Text style={styles.lockText}>Kunci Skrin</Text>
         </TouchableOpacity>
       </View>
@@ -61,18 +63,13 @@ const styles = StyleSheet.create({
   iconButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingVertical: 6,
+    gap: 6,
+    paddingVertical: 7,
     paddingHorizontal: 10,
     borderRadius: 8,
     backgroundColor: '#F4F4F5',
     borderWidth: 1,
     borderColor: '#E4E4E7',
-  },
-  backArrow: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#09090B',
   },
   backText: {
     fontSize: 12,
@@ -93,8 +90,11 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   resetButton: {
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     borderRadius: 8,
     backgroundColor: '#F4F4F5',
     borderWidth: 1,
@@ -108,14 +108,11 @@ const styles = StyleSheet.create({
   lockButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
     backgroundColor: '#09090B',
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
-  },
-  lockIcon: {
-    fontSize: 12,
   },
   lockText: {
     color: '#FFFFFF',

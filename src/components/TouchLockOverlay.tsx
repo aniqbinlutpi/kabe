@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { AppIcon } from '@/components/AppIcon';
 
 interface TouchLockOverlayProps {
   isLocked: boolean;
@@ -47,10 +48,10 @@ export const TouchLockOverlay: React.FC<TouchLockOverlayProps> = ({
       {/* Floating Status Badge & Unlock Button */}
       <View style={styles.controlCenter}>
         <View style={styles.statusBadge}>
-          <Text style={styles.statusIcon}>🔒</Text>
+          <AppIcon name="lock" size={18} color="#FFFFFF" />
           <View>
             <Text style={styles.statusTitle}>Skrin Dikunci</Text>
-            <Text style={styles.statusSubtitle}>Letak kertas & mula tekap lukisan!</Text>
+            <Text style={styles.statusSubtitle}>Letak kertas & mula tekap lukisan</Text>
           </View>
         </View>
 
@@ -70,7 +71,10 @@ export const TouchLockOverlay: React.FC<TouchLockOverlayProps> = ({
                 },
               ]}
             />
-            <Text style={styles.unlockButtonText}>🔓 Tekan Lama Untuk Buka</Text>
+            <View style={styles.unlockTextGroup}>
+              <AppIcon name="unlock" size={14} color="#FFFFFF" />
+              <Text style={styles.unlockButtonText}>Tekan Lama Untuk Buka</Text>
+            </View>
           </View>
         </TouchableWithoutFeedback>
       </View>
@@ -106,9 +110,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 14,
   },
-  statusIcon: {
-    fontSize: 20,
-  },
   statusTitle: {
     color: '#FFFFFF',
     fontSize: 13,
@@ -138,10 +139,15 @@ const styles = StyleSheet.create({
     opacity: 0.3,
     zIndex: 1,
   },
+  unlockTextGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    zIndex: 2,
+  },
   unlockButtonText: {
     color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '800',
-    zIndex: 2,
   },
 });

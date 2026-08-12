@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { AppIcon } from '@/components/AppIcon';
 import { TouchLockOverlay } from '@/components/TouchLockOverlay';
 import { TracingHeader } from '@/components/TracingHeader';
 import { TracingToolbar } from '@/components/TracingToolbar';
@@ -39,8 +40,14 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isSelected, setIsSelected] = useState(true);
 
+  // Layout refs to measure image center for rotation
+  const imageBoxRef = useRef<View>(null);
+  const imageCenterRef = useRef<{ x: number; y: number }>({ x: 200, y: 300 });
+
   const initialPinchDist = useRef<number | null>(null);
   const initialScale = useRef<number>(1.0);
+  const initialRotationAngle = useRef<number | null>(null);
+  const initialRotation = useRef<number>(0);
   const handleStartScale = useRef<number>(1.0);
 
   const handleUpdateConfig = (newPartial: Partial<TracingStudioConfig>) => {
@@ -59,31 +66,61 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
     return Math.sqrt(dx * dx + dy * dy);
   };
 
-  // Main Image Pan & Pinch Responder
+  const getAngleDegrees = (touches: any[]) => {
+    const dx = touches[1].pageX - touches[0].pageX;
+    const dy = touches[1].pageY - touches[0].pageY;
+    return (Math.atan2(dy, dx) * 180) / Math.PI;
+  };
+
+  // Main Image Pan, Pinch & 360° Touch Rotation Responder
   const imagePanResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => !config.isLocked,
     onMoveShouldSetPanResponder: () => !config.isLocked,
     onPanResponderGrant: (evt) => {
       if (config.isLocked) return;
       setIsSelected(true);
+
+      // Store image box screen center for rotation
+      if (imageBoxRef.current) {
+        imageBoxRef.current.measureInWindow((x, y, w, h) => {
+          imageCenterRef.current = { x: x + w / 2, y: y + h / 2 };
+        });
+      }
+
       if (evt.nativeEvent.touches.length === 2) {
         initialPinchDist.current = getDistance(evt.nativeEvent.touches);
         initialScale.current = config.scale;
+        initialRotationAngle.current = getAngleDegrees(evt.nativeEvent.touches);
+        initialRotation.current = config.rotation;
       }
     },
     onPanResponderMove: (evt, gestureState) => {
       if (config.isLocked) return;
 
-      // Handle 2-finger pinch
+      // Handle 2-finger pinch-zoom AND 360° touch rotation
       if (evt.nativeEvent.touches.length === 2 && initialPinchDist.current) {
         const currentDist = getDistance(evt.nativeEvent.touches);
         const factor = currentDist / initialPinchDist.current;
-        const newScale = Math.min(5.0, Math.max(0.2, initialScale.current * factor));
-        setConfig((prev) => ({ ...prev, scale: newScale }));
+        const newScale = Math.min(6.0, Math.max(0.2, initialScale.current * factor));
+
+        let newRotation = config.rotation;
+        if (initialRotationAngle.current !== null) {
+          const currentAngle = getAngleDegrees(evt.nativeEvent.touches);
+          const angleDelta = currentAngle - initialRotationAngle.current;
+          let calculatedRotation = Math.round((initialRotation.current + angleDelta) % 360);
+          if (calculatedRotation < 0) calculatedRotation += 360;
+          newRotation = calculatedRotation;
+        }
+
+        setConfig((prev) => ({
+          ...prev,
+          scale: newScale,
+          rotation: newRotation,
+        }));
         return;
       }
 
-      // Handle 1-finger pan/drag
+      // Handle 1-finger pan/drag position
       if (evt.nativeEvent.touches.length === 1) {
         setConfig((prev) => ({
           ...prev,
@@ -97,6 +134,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
     onPanResponderRelease: (_, gestureState) => {
       if (config.isLocked) return;
       initialPinchDist.current = null;
+      initialRotationAngle.current = null;
       setPanOffset({
         x: panOffset.x + gestureState.dx,
         y: panOffset.y + gestureState.dy,
@@ -104,7 +142,27 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
     },
   });
 
-  // Dedicated Corner Resize Handle PanResponder for scaling
+  // Top Knob 360° Touch Rotation Responder
+  const rotateKnobResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponderCapture: () => true,
+      onPanResponderMove: (evt) => {
+        const touchX = evt.nativeEvent.pageX;
+        const touchY = evt.nativeEvent.pageY;
+        const center = imageCenterRef.current;
+        const rad = Math.atan2(touchY - center.y, touchX - center.x);
+        let deg = Math.round(rad * (180 / Math.PI)) + 90;
+        if (deg < 0) deg += 360;
+        deg = deg % 360;
+        setConfig((prev) => ({ ...prev, rotation: deg }));
+      },
+    })
+  ).current;
+
+  // Corner Resize Responders
   const createCornerResizeResponder = (cornerMultiplier: { x: number; y: number }) => {
     return PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -115,7 +173,6 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
         handleStartScale.current = config.scale;
       },
       onPanResponderMove: (_, gestureState) => {
-        // Compute delta based on corner drag direction
         const delta =
           (gestureState.dx * cornerMultiplier.x + gestureState.dy * cornerMultiplier.y) / 120;
         const newScale = Math.min(6.0, Math.max(0.2, handleStartScale.current + delta));
@@ -127,18 +184,10 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
     });
   };
 
-  const bottomRightResponder = useRef(
-    createCornerResizeResponder({ x: 1, y: 1 })
-  ).current;
-  const topLeftResponder = useRef(
-    createCornerResizeResponder({ x: -1, y: -1 })
-  ).current;
-  const topRightResponder = useRef(
-    createCornerResizeResponder({ x: 1, y: -1 })
-  ).current;
-  const bottomLeftResponder = useRef(
-    createCornerResizeResponder({ x: -1, y: 1 })
-  ).current;
+  const bottomRightResponder = useRef(createCornerResizeResponder({ x: 1, y: 1 })).current;
+  const topLeftResponder = useRef(createCornerResizeResponder({ x: -1, y: -1 })).current;
+  const topRightResponder = useRef(createCornerResizeResponder({ x: 1, y: -1 })).current;
+  const bottomLeftResponder = useRef(createCornerResizeResponder({ x: -1, y: 1 })).current;
 
   const getImageFilterStyles = () => {
     let opacity = config.opacity;
@@ -191,6 +240,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
           >
             {/* Image Box */}
             <View
+              ref={imageBoxRef}
               style={[
                 styles.imageBox,
                 isSelected && !config.isLocked && styles.selectedBoundingBox,
@@ -204,15 +254,21 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
               />
             </View>
 
-            {/* Transform Handles - Positioned outside imageBox to receive direct touches */}
+            {/* Transform Handles */}
             {isSelected && !config.isLocked && (
               <>
-                {/* Top Rotation Handle */}
-                <View style={styles.rotateHandleKnob} pointerEvents="none">
-                  <View style={styles.rotateHandleCircle} />
+                {/* 360° Top Rotation Handle Touch Area */}
+                <View
+                  style={styles.rotateHandleKnobTouchArea}
+                  {...rotateKnobResponder.panHandlers}
+                >
+                  <View style={styles.rotateHandleLine} />
+                  <View style={styles.rotateHandleCircle}>
+                    <AppIcon name="reset" size={12} color="#3B82F6" />
+                  </View>
                 </View>
 
-                {/* 4 Corner Touch Target Handles (44x44px touch area) */}
+                {/* 4 Corner Touch Target Handles */}
                 <View
                   style={[styles.cornerTouchArea, styles.topLeftTouch]}
                   {...topLeftResponder.panHandlers}
@@ -244,7 +300,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
             )}
           </View>
 
-          {/* Canvas Floating Quick "🔒 Lock Screen" Button */}
+          {/* Canvas Floating Quick "Lock Screen" Button */}
           {!config.isLocked && (
             <TouchableOpacity
               activeOpacity={0.8}
@@ -254,12 +310,12 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
                 setIsSelected(false);
               }}
             >
-              <Text style={styles.floatingCanvasLockIcon}>🔒</Text>
+              <AppIcon name="lock" size={14} color="#FFFFFF" />
               <Text style={styles.floatingCanvasLockText}>Lock Screen</Text>
             </TouchableOpacity>
           )}
 
-          {/* High Brightness / Tracing Lightbox Overlay */}
+          {/* Lightbox Overlay */}
           <View
             style={[
               styles.lightboxFilter,
@@ -279,7 +335,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
         isLocked={config.isLocked}
       />
 
-      {/* Touch Lock Screen Overlay for paper tracing */}
+      {/* Touch Lock Screen Overlay */}
       <TouchLockOverlay
         isLocked={config.isLocked}
         onUnlock={() => handleUpdateConfig({ isLocked: false })}
@@ -323,21 +379,35 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  rotateHandleKnob: {
+  rotateHandleKnobTouchArea: {
     position: 'absolute',
-    top: -24,
+    top: -38,
     alignSelf: 'center',
     alignItems: 'center',
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    zIndex: 100,
+  },
+  rotateHandleLine: {
+    width: 2,
+    height: 12,
+    backgroundColor: '#3B82F6',
+    position: 'absolute',
+    bottom: 4,
   },
   rotateHandleCircle: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderColor: '#3B82F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 2,
   },
-  // Corner Touch Target Areas (44x44px for easy finger drag)
   cornerTouchArea: {
     position: 'absolute',
     width: 44,
@@ -394,9 +464,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
     zIndex: 90,
-  },
-  floatingCanvasLockIcon: {
-    fontSize: 14,
   },
   floatingCanvasLockText: {
     color: '#FFFFFF',

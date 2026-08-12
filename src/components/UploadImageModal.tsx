@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { AppIcon } from '@/components/AppIcon';
 
 interface UploadImageModalProps {
   visible: boolean;
@@ -85,7 +86,10 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.modalCard}>
-          <Text style={styles.modalTitle}>Muat Naik Gambar Baru</Text>
+          <View style={styles.titleGroup}>
+            <AppIcon name="image" size={20} color="#09090B" />
+            <Text style={styles.modalTitle}>Muat Naik Gambar Baru</Text>
+          </View>
           <Text style={styles.modalSub}>
             Pilih gambar dari galeri peranti untuk dijadikan corak tekap lukisan.
           </Text>
@@ -106,18 +110,24 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
               style={[styles.toggleBtn, !useUrl && styles.toggleBtnActive]}
               onPress={() => setUseUrl(false)}
             >
-              <Text style={[styles.toggleText, !useUrl && styles.toggleTextActive]}>
-                🖼️ Galeri Peranti
-              </Text>
+              <View style={styles.tabContent}>
+                <AppIcon name="image" size={14} color={!useUrl ? '#09090B' : '#71717A'} />
+                <Text style={[styles.toggleText, !useUrl && styles.toggleTextActive]}>
+                  Galeri Peranti
+                </Text>
+              </View>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.toggleBtn, useUrl && styles.toggleBtnActive]}
               onPress={() => setUseUrl(true)}
             >
-              <Text style={[styles.toggleText, useUrl && styles.toggleTextActive]}>
-                🔗 URL Gambar
-              </Text>
+              <View style={styles.tabContent}>
+                <AppIcon name="link" size={14} color={useUrl ? '#09090B' : '#71717A'} />
+                <Text style={[styles.toggleText, useUrl && styles.toggleTextActive]}>
+                  URL Gambar
+                </Text>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -125,7 +135,10 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
             <View style={styles.pickerBox}>
               {selectedUri ? (
                 <View style={styles.previewContainer}>
-                  <Text style={styles.previewTag}>✓ Gambar Dipilih Dari Galeri</Text>
+                  <View style={styles.tagGroup}>
+                    <AppIcon name="check" size={14} color="#09090B" />
+                    <Text style={styles.previewTag}>Gambar Dipilih Dari Galeri</Text>
+                  </View>
                   <TouchableOpacity
                     style={styles.repickBtn}
                     onPress={() => setSelectedUri(null)}
@@ -145,10 +158,12 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
                         borderRadius: '8px',
                         fontSize: '13px',
                         fontWeight: '700',
-                        display: 'inline-block',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
                       } as any}
                     >
-                      <span>📂 Buka Galeri Gambar</span>
+                      <span>Buka Galeri Gambar</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -161,7 +176,8 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
                       style={styles.pickImageBtn}
                       onPress={handlePickFromGallery}
                     >
-                      <Text style={styles.pickImageText}>📂 Buka Galeri Gambar</Text>
+                      <AppIcon name="folder" size={14} color="#FFFFFF" />
+                      <Text style={styles.pickImageText}>Buka Galeri Gambar</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -213,6 +229,11 @@ const styles = StyleSheet.create({
     maxWidth: 460,
     gap: 16,
   },
+  titleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   modalTitle: {
     fontSize: 18,
     fontWeight: '800',
@@ -259,6 +280,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E4E4E7',
   },
+  tabContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   toggleText: {
     fontSize: 12,
     fontWeight: '600',
@@ -284,6 +310,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   pickImageBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: '#09090B',
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -297,6 +326,11 @@ const styles = StyleSheet.create({
   previewContainer: {
     alignItems: 'center',
     gap: 8,
+  },
+  tagGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   previewTag: {
     color: '#09090B',
