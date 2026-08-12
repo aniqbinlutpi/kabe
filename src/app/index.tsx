@@ -1,98 +1,117 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { UploadImageModal } from '@/components/UploadImageModal';
+import { PRESET_IMAGES } from '@/constants/PresetCategories';
+import { StorageService } from '@/services/StorageService';
+import { CategoryItem, TracingImage } from '@/types/TracingTypes';
+import { CategorySelectionScreen } from '@/views/CategorySelectionScreen';
+import { ImageGalleryScreen } from '@/views/ImageGalleryScreen';
+import { TracingStudioScreen } from '@/views/TracingStudioScreen';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+type ActiveView = 'categories' | 'gallery' | 'studio';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+export default function RootApp() {
+  const [activeView, setActiveView] = useState<ActiveView>('categories');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryItem | null>(null);
+  const [selectedImage, setSelectedImage] = useState<TracingImage | null>(null);
+  const [customImages, setCustomImages] = useState<TracingImage[]>([]);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  // Load custom images from local storage on launch
+  useEffect(() => {
+    async function loadSavedImages() {
+      const saved = await StorageService.getCustomImages();
+      setCustomImages(saved);
+    }
+    loadSavedImages();
+  }, []);
+
+  const allImages = [...customImages, ...PRESET_IMAGES];
+
+  const handleSelectCategory = (category: CategoryItem) => {
+    setSelectedCategory(category);
+    setActiveView('gallery');
+  };
+
+  const handleSelectImage = (image: TracingImage) => {
+    setSelectedImage(image);
+    setActiveView('studio');
+  };
+
+  const handleCustomImageUploaded = async (title: string, uri: string) => {
+    const newImage = await StorageService.saveCustomImage({
+      title,
+      uri,
+    });
+    setCustomImages((prev) => [newImage, ...prev]);
+
+    // Automatically enter studio mode with new uploaded image!
+    setSelectedImage(newImage);
+    setActiveView('studio');
+  };
+
+  const handleDeleteCustomImage = async (id: string) => {
+    const success = await StorageService.deleteCustomImage(id);
+    if (success) {
+      setCustomImages((prev) => prev.filter((img) => img.id !== id));
+    }
+  };
+
+  const getGalleryImages = () => {
+    if (!selectedCategory) return [];
+    if (selectedCategory.id === 'uploads') return customImages;
+    return allImages.filter((img) => img.categoryId === selectedCategory.id);
+  };
+
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
-
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <View style={styles.container}>
+        {activeView === 'categories' && (
+          <CategorySelectionScreen
+            onSelectCategory={handleSelectCategory}
+            onOpenUploadModal={() => setIsUploadModalOpen(true)}
+            customImages={customImages}
+            allImages={allImages}
           />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+        )}
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+        {activeView === 'gallery' && selectedCategory && (
+          <ImageGalleryScreen
+            category={selectedCategory}
+            images={getGalleryImages()}
+            onSelectImage={handleSelectImage}
+            onBack={() => setActiveView('categories')}
+            onOpenUploadModal={() => setIsUploadModalOpen(true)}
+            onDeleteImage={handleDeleteCustomImage}
+          />
+        )}
+
+        {activeView === 'studio' && selectedImage && (
+          <TracingStudioScreen
+            image={selectedImage}
+            onBack={() => setActiveView(selectedCategory ? 'gallery' : 'categories')}
+          />
+        )}
+
+        {/* Global Upload Image Modal */}
+        <UploadImageModal
+          visible={isUploadModalOpen}
+          onClose={() => setIsUploadModalOpen(false)}
+          onImageUploaded={handleCustomImageUploaded}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
-  },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    backgroundColor: '#09090B',
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  container: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+    backgroundColor: '#FFFFFF',
   },
 });

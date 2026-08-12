@@ -1,56 +1,85 @@
-# Welcome to your Expo app 👋
+# Ketah Kabe ✏️ - Aplikasi Tekap & Mewarna Budak (Mobile & iPad)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Ketah Kabe** adalah aplikasi responsif untuk kanak-kanak belajar melukis & menekap lukisan. Kanak-kanak boleh meletakkan kertas fizikal di atas skrin telefon pintar atau iPad/Tablet dan tekap corak lukisan dengan mudah!
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Ciri-Ciri Utama (Key Features)
 
-   ```bash
-   npm install
-   ```
+- 📱 **Responsif Telefon & iPad/Tablet**: Susunan grid melaras secara automatik mengikut saiz skrin peranti (2 kolum telefon, 3-4 kolum iPad).
+- 🔒 **Kunci Skrin Tekap (Touch Lock Screen Overlay)**: Kawalan sentuhan dikunci supaya skrin tidak bergerak atau terkeluar semasa kertas fizikal diletakkan di atas skrin dan anak-anak melukis.
+- 🎨 **Pelbagai Kategori Lukisan**: Kategori sedia ada seperti *Anime*, *Kartun*, *Buah-buahan*, *Haiwan*, dan *Lain-lain*.
+- 🖼️ **Muat Naik Gambar Sendiri**: Sokongan upload gambar dari galeri peranti atau pautan URL.
+- ☀️ **Mode Lightbox & Penapis Line-Art**: Kawalan kecerahan, zoom, putaran, dan mod garisan kontras tinggi untuk tekap lukisan menerusi kertas dengan lebih jelas.
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 🛠️ Pemasangan & Arahan (Run with any Package Manager)
 
-In the output, you'll find options to open the app in a
+Projek ini menyokong pelbagai pengurus pakej (Package Manager): **Bun**, **npm**, **pnpm**, atau **Yarn**.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 1. Install Dependencies
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Boleh guna pengurus pakej pilihan anda:
 
 ```bash
-npm run reset-project
+# Menggunakan Bun
+bun install
+
+# Menggunakan npm
+npm install
+
+# Menggunakan pnpm
+pnpm install
+
+# Menggunakan Yarn
+yarn install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Start Project (Expo Dev Server)
 
-### Other setup steps
+```bash
+# Menggunakan Bun
+bun start
+# atau bun run web / bun run ios / bun run android
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+# Menggunakan npm
+npm start
+# atau npx expo start
 
-## Learn more
+# Menggunakan pnpm
+pnpm start
 
-To learn more about developing your project with Expo, look at the following resources:
+# Menggunakan Yarn
+yarn start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 📁 Struktur Fail (File Architecture)
 
-Join our community of developers creating universal apps.
+Fail projek diatur secara berstruktur tanpa menggunakan nama fail `index` pada komponen/servis:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```text
+src/
+├── app/                  # Route entry point Expo Router (_layout.tsx, index.tsx)
+├── components/           # Komponen UI spesifik
+│   ├── CategoryCard.tsx
+│   ├── ImageGridCard.tsx
+│   ├── TracingHeader.tsx
+│   ├── TracingToolbar.tsx
+│   ├── TouchLockOverlay.tsx
+│   └── UploadImageModal.tsx
+├── views/                # Paparan skrin utama
+│   ├── CategorySelectionScreen.tsx
+│   ├── ImageGalleryScreen.tsx
+│   └── TracingStudioScreen.tsx
+├── hooks/
+│   └── useResponsiveLayout.ts
+├── services/
+│   └── StorageService.ts
+├── constants/
+│   └── PresetCategories.ts
+└── types/
+    └── TracingTypes.ts
+```
