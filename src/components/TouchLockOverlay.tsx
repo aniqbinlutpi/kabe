@@ -1,21 +1,26 @@
 import React, { useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { AppIcon } from '@/components/AppIcon';
+import { Language, TRANSLATIONS } from '@/constants/Translations';
 
 interface TouchLockOverlayProps {
   isLocked: boolean;
   onUnlock: () => void;
+  language?: Language;
 }
 
 export const TouchLockOverlay: React.FC<TouchLockOverlayProps> = ({
   isLocked,
   onUnlock,
+  language = 'bm',
 }) => {
   const [progress, setProgress] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const progressAnim = useRef(new Animated.Value(0)).current;
 
   if (!isLocked) return null;
+
+  const t = TRANSLATIONS[language];
 
   const startUnlockTimer = () => {
     setProgress(0);
@@ -50,8 +55,8 @@ export const TouchLockOverlay: React.FC<TouchLockOverlayProps> = ({
         <View style={styles.statusBadge}>
           <AppIcon name="lock" size={18} color="#FFFFFF" />
           <View>
-            <Text style={styles.statusTitle}>Skrin Dikunci</Text>
-            <Text style={styles.statusSubtitle}>Letak kertas & mula tekap lukisan</Text>
+            <Text style={styles.statusTitle}>{t.screenLocked}</Text>
+            <Text style={styles.statusSubtitle}>{t.placePaperHint}</Text>
           </View>
         </View>
 
@@ -73,7 +78,7 @@ export const TouchLockOverlay: React.FC<TouchLockOverlayProps> = ({
             />
             <View style={styles.unlockTextGroup}>
               <AppIcon name="unlock" size={14} color="#FFFFFF" />
-              <Text style={styles.unlockButtonText}>Tekan Lama Untuk Buka</Text>
+              <Text style={styles.unlockButtonText}>{t.holdToUnlock}</Text>
             </View>
           </View>
         </TouchableWithoutFeedback>

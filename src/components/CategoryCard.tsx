@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { CategoryItem } from '@/types/TracingTypes';
 
 interface CategoryCardProps {
@@ -7,15 +8,42 @@ interface CategoryCardProps {
   itemCount?: number;
   onPress: (category: CategoryItem) => void;
   cardHeight?: number;
+  language?: Language;
+  themeMode?: ThemeMode;
 }
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({
   category,
   itemCount,
   onPress,
-  cardHeight = 150,
+  cardHeight = 155,
+  language = 'bm',
+  themeMode = 'light',
 }) => {
+  const t = TRANSLATIONS[language];
+  const colors = COLOR_THEMES[themeMode];
   const isDarkCard = category.id === 'uploads';
+
+  // Translated category titles & subtitles
+  const getCategoryTitle = () => {
+    if (category.id === 'uploads') return t.myUploadsTitle;
+    if (category.id === 'anime') return 'Anime & Chibi';
+    if (category.id === 'cartoon') return language === 'en' ? 'Cartoons' : 'Kartun';
+    if (category.id === 'fruit') return language === 'en' ? 'Fruits' : 'Buah-buahan';
+    if (category.id === 'animal') return language === 'en' ? 'Animals' : 'Haiwan';
+    return language === 'en' ? 'Others' : 'Lain-lain';
+  };
+
+  const getCategorySub = () => {
+    if (category.id === 'uploads') return t.myUploadsSub;
+    if (category.id === 'anime') return language === 'en' ? 'Anime & Chibi Characters' : 'Karakter Anime & Line Art';
+    if (category.id === 'cartoon') return language === 'en' ? 'Animation Characters' : 'Watak Animasi & Lukisan';
+    if (category.id === 'fruit') return language === 'en' ? 'Fruits & Healthy Food' : 'Buah & Objek Alam';
+    if (category.id === 'animal') return language === 'en' ? 'Cute Cats, Birds & Pets' : 'Kucing, Burung & Corak Comel';
+    return language === 'en' ? 'Vehicles & Physical Objects' : 'Kenderaan & Objek Fizikal';
+  };
+
+  const badgeText = category.id === 'uploads' ? t.myUploadsBadge : category.badgeText;
 
   return (
     <TouchableOpacity
@@ -23,33 +51,73 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       onPress={() => onPress(category)}
       style={[
         styles.cardContainer,
-        { minHeight: cardHeight },
-        isDarkCard ? styles.darkCard : styles.lightCard,
+        {
+          minHeight: cardHeight,
+          backgroundColor: isDarkCard ? '#09090B' : colors.cardBackground,
+          borderColor: isDarkCard ? '#27272A' : colors.cardBorder,
+        },
       ]}
     >
       <View style={styles.topSection}>
-        {category.badgeText ? (
-          <View style={[styles.badge, isDarkCard ? styles.darkBadge : styles.lightBadge]}>
-            <Text style={isDarkCard ? styles.darkBadgeText : styles.lightBadgeText}>
-              {category.badgeText}
+        {badgeText ? (
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: isDarkCard ? '#27272A' : colors.buttonBackground,
+                borderColor: isDarkCard ? '#3F3F46' : colors.buttonBorder,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.badgeText,
+                { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+              ]}
+            >
+              {badgeText}
             </Text>
           </View>
         ) : (
           <View style={styles.badgeSpacer} />
         )}
 
-        <Text style={[styles.titleText, isDarkCard ? styles.textLight : styles.textDark]}>
-          {category.title}
+        <Text
+          style={[
+            styles.titleText,
+            { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+          ]}
+        >
+          {getCategoryTitle()}
         </Text>
-        <Text style={[styles.subtitleText, isDarkCard ? styles.subLight : styles.subDark]} numberOfLines={2}>
-          {category.subtitle}
+        <Text
+          style={[
+            styles.subtitleText,
+            { color: isDarkCard ? '#A1A1AA' : colors.textSecondary },
+          ]}
+          numberOfLines={2}
+        >
+          {getCategorySub()}
         </Text>
       </View>
 
       {itemCount !== undefined && (
-        <View style={[styles.countTag, isDarkCard ? styles.tagDark : styles.tagLight]}>
-          <Text style={[styles.countText, isDarkCard ? styles.textLight : styles.textDark]}>
-            {itemCount} gambar
+        <View
+          style={[
+            styles.countTag,
+            {
+              backgroundColor: isDarkCard ? '#18181B' : colors.buttonBackground,
+              borderColor: isDarkCard ? '#27272A' : colors.buttonBorder,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.countText,
+              { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+            ]}
+          >
+            {itemCount} {t.imageCountUnit}
           </Text>
         </View>
       )}
@@ -66,14 +134,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: 'hidden',
   },
-  lightCard: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E4E4E7',
-  },
-  darkCard: {
-    backgroundColor: '#09090B',
-    borderColor: '#27272A',
-  },
   topSection: {
     gap: 4,
   },
@@ -88,23 +148,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     borderWidth: 1,
   },
-  lightBadge: {
-    backgroundColor: '#F4F4F5',
-    borderColor: '#E4E4E7',
-  },
-  darkBadge: {
-    backgroundColor: '#27272A',
-    borderColor: '#3F3F46',
-  },
-  lightBadgeText: {
-    color: '#09090B',
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-    textTransform: 'uppercase',
-  },
-  darkBadgeText: {
-    color: '#FFFFFF',
+  badgeText: {
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -121,18 +165,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 16,
   },
-  textDark: {
-    color: '#09090B',
-  },
-  textLight: {
-    color: '#FFFFFF',
-  },
-  subDark: {
-    color: '#71717A',
-  },
-  subLight: {
-    color: '#A1A1AA',
-  },
   countTag: {
     alignSelf: 'flex-start',
     marginTop: 12,
@@ -140,14 +172,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 6,
     borderWidth: 1,
-  },
-  tagLight: {
-    backgroundColor: '#F4F4F5',
-    borderColor: '#E4E4E7',
-  },
-  tagDark: {
-    backgroundColor: '#18181B',
-    borderColor: '#27272A',
   },
   countText: {
     fontSize: 11,

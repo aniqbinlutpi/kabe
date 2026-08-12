@@ -15,7 +15,9 @@ export type IconName =
   | 'flip'
   | 'link'
   | 'folder'
-  | 'check';
+  | 'check'
+  | 'settings'
+  | 'globe';
 
 interface AppIconProps {
   name: IconName;
@@ -28,8 +30,68 @@ export const AppIcon: React.FC<AppIconProps> = ({
   size = 18,
   color = '#09090B',
 }) => {
-  // Render clean vector icon paths using React Native shapes & SVG compatible path structures
   switch (name) {
+    case 'settings':
+      return (
+        <View style={[styles.box, { width: size, height: size }]}>
+          <View
+            style={{
+              width: size * 0.7,
+              height: size * 0.7,
+              borderRadius: (size * 0.7) / 2,
+              borderWidth: 2,
+              borderColor: color,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <View
+              style={{
+                width: size * 0.25,
+                height: size * 0.25,
+                borderRadius: (size * 0.25) / 2,
+                backgroundColor: color,
+              }}
+            />
+          </View>
+        </View>
+      );
+
+    case 'globe':
+      return (
+        <View style={[styles.box, { width: size, height: size }]}>
+          <View
+            style={{
+              width: size * 0.8,
+              height: size * 0.8,
+              borderRadius: (size * 0.8) / 2,
+              borderWidth: 1.8,
+              borderColor: color,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <View
+              style={{
+                width: size * 0.35,
+                height: size * 0.78,
+                borderRadius: (size * 0.35) / 2,
+                borderWidth: 1.4,
+                borderColor: color,
+              }}
+            />
+            <View
+              style={{
+                width: size * 0.78,
+                height: 1.4,
+                backgroundColor: color,
+                position: 'absolute',
+              }}
+            />
+          </View>
+        </View>
+      );
+
     case 'lock':
       return (
         <View style={[styles.box, { width: size, height: size }]}>
@@ -200,7 +262,7 @@ export const AppIcon: React.FC<AppIconProps> = ({
                 width: size * 0.5,
                 height: size * 0.5,
                 borderRadius: (size * 0.5) / 2,
-                backgroundColor: '#FFFFFF',
+                backgroundColor: color === '#FFFFFF' ? '#09090B' : '#FFFFFF',
                 position: 'absolute',
                 top: -2,
                 right: -2,

@@ -1,6 +1,9 @@
+import { Language, ThemeMode } from '@/constants/Translations';
 import { TracingImage } from '@/types/TracingTypes';
 
 const UPLOADED_IMAGES_KEY = '@ketah_kabe_custom_images_v1';
+const LANGUAGE_KEY = '@ketah_kabe_language_v1';
+const THEME_KEY = '@ketah_kabe_theme_v1';
 
 // In-memory fallback if localStorage is unavailable
 let memoryStorage: Record<string, string> = {};
@@ -72,5 +75,23 @@ export const StorageService = {
       console.warn('Failed to delete custom image:', e);
       return false;
     }
+  },
+
+  async getLanguage(): Promise<Language> {
+    const val = getItem(LANGUAGE_KEY);
+    return val === 'en' ? 'en' : 'bm';
+  },
+
+  async saveLanguage(lang: Language): Promise<void> {
+    setItem(LANGUAGE_KEY, lang);
+  },
+
+  async getThemeMode(): Promise<ThemeMode> {
+    const val = getItem(THEME_KEY);
+    return val === 'dark' ? 'dark' : 'light';
+  },
+
+  async saveThemeMode(theme: ThemeMode): Promise<void> {
+    setItem(THEME_KEY, theme);
   },
 };

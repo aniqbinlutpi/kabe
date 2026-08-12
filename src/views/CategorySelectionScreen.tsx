@@ -3,24 +3,34 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-nati
 import { AppIcon } from '@/components/AppIcon';
 import { CategoryCard } from '@/components/CategoryCard';
 import { CATEGORIES } from '@/constants/PresetCategories';
+import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
 
 interface CategorySelectionScreenProps {
   onSelectCategory: (category: CategoryItem) => void;
   onOpenUploadModal: () => void;
+  onOpenSettingsModal: () => void;
   customImages: TracingImage[];
   allImages: TracingImage[];
+  language: Language;
+  themeMode: ThemeMode;
 }
 
 export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
   onSelectCategory,
   onOpenUploadModal,
+  onOpenSettingsModal,
   customImages,
   allImages,
+  language,
+  themeMode,
 }) => {
   const { columns, gap, paddingHorizontal, maxContainerWidth, cardHeight, isTablet } =
     useResponsiveLayout();
+
+  const t = TRANSLATIONS[language];
+  const colors = COLOR_THEMES[themeMode];
 
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'uploads') return customImages.length;
@@ -29,26 +39,44 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
 
   return (
     <ScrollView
-      style={styles.screenContainer}
-      contentContainerStyle={[
-        styles.scrollContent,
-        { paddingHorizontal },
-      ]}
+      style={[styles.screenContainer, { backgroundColor: colors.background }]}
+      contentContainerStyle={[styles.scrollContent, { paddingHorizontal }]}
       showsVerticalScrollIndicator={false}
     >
       <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
-        {/* App Hero / Header Banner - Minimalist Black & White */}
-        <View style={[styles.heroCard, isTablet && styles.heroCardTablet]}>
+        {/* App Top Bar with Brand & Settings Icon */}
+        <View style={styles.topBar}>
+          <View style={styles.brandGroup}>
+            <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>Ketah Kabe</Text>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.settingsIconBtn,
+              { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+            ]}
+            onPress={onOpenSettingsModal}
+          >
+            <AppIcon name="settings" size={16} color={colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+
+        {/* App Hero / Header Banner */}
+        <View
+          style={[
+            styles.heroCard,
+            { backgroundColor: colors.heroCardBackground, borderColor: colors.cardBorder },
+            isTablet && styles.heroCardTablet,
+          ]}
+        >
           <View style={styles.heroTextGroup}>
             <View style={styles.appBadge}>
-              <Text style={styles.appBadgeText}>KETAH KABE TRACING</Text>
+              <Text style={styles.appBadgeText}>{t.appTag}</Text>
             </View>
             <Text style={[styles.heroTitle, isTablet && styles.heroTitleTablet]}>
-              Welcome to Ketah Kabe
+              {t.heroTitle}
             </Text>
-            <Text style={styles.heroSub}>
-              Aplikasi tekap lukisan mudah. Pilih gambar, letak kertas di atas skrin telefon/iPad & mula melukis.
-            </Text>
+            <Text style={styles.heroSub}>{t.heroSub}</Text>
           </View>
 
           <TouchableOpacity
@@ -57,17 +85,21 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
             onPress={onOpenUploadModal}
           >
             <AppIcon name="plus" size={14} color="#09090B" />
-            <Text style={styles.uploadHeaderText}>Upload Gambar</Text>
+            <Text style={styles.uploadHeaderText}>{t.uploadButton}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Section Heading */}
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Kategori Lukisan</Text>
-          <Text style={styles.sectionSub}>Pilih kategori untuk melihat senarai gambar tekap</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+            {t.categoryTitle}
+          </Text>
+          <Text style={[styles.sectionSub, { color: colors.textSecondary }]}>
+            {t.categorySub}
+          </Text>
         </View>
 
-        {/* Dynamic Category Grid (Responsive for Mobile & iPad) */}
+        {/* Dynamic Category Grid */}
         <View style={[styles.gridContainer, { gap }]}>
           {CATEGORIES.map((cat) => {
             const itemCount = getCategoryCount(cat.id);
@@ -80,6 +112,8 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
                   itemCount={itemCount}
                   onPress={onSelectCategory}
                   cardHeight={cardHeight}
+                  language={language}
+                  themeMode={themeMode}
                 />
               </View>
             );
@@ -93,23 +127,40 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
-    paddingVertical: 24,
+    paddingVertical: 20,
     alignItems: 'center',
   },
   innerContainer: {
     width: '100%',
-    gap: 24,
+    gap: 20,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brandGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  brandTitle: {
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: -0.5,
+  },
+  settingsIconBtn: {
+    padding: 8,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   heroCard: {
-    backgroundColor: '#09090B',
     borderRadius: 16,
     padding: 24,
     gap: 16,
     borderWidth: 1,
-    borderColor: '#27272A',
   },
   heroCardTablet: {
     padding: 32,
@@ -123,9 +174,9 @@ const styles = StyleSheet.create({
   },
   appBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: '#18181B',
+    backgroundColor: '#27272A',
     borderWidth: 1,
-    borderColor: '#27272A',
+    borderColor: '#3F3F46',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
@@ -173,12 +224,10 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#09090B',
     letterSpacing: -0.3,
   },
   sectionSub: {
     fontSize: 12,
-    color: '#71717A',
     fontWeight: '400',
   },
   gridContainer: {

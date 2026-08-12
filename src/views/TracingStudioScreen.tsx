@@ -12,11 +12,15 @@ import { AppIcon } from '@/components/AppIcon';
 import { TouchLockOverlay } from '@/components/TouchLockOverlay';
 import { TracingHeader } from '@/components/TracingHeader';
 import { TracingToolbar } from '@/components/TracingToolbar';
+import { Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { TracingImage, TracingStudioConfig } from '@/types/TracingTypes';
 
 interface TracingStudioScreenProps {
   image: TracingImage;
   onBack: () => void;
+  onOpenSettingsModal?: () => void;
+  language?: Language;
+  themeMode?: ThemeMode;
 }
 
 const DEFAULT_CONFIG: TracingStudioConfig = {
@@ -35,10 +39,15 @@ const DEFAULT_CONFIG: TracingStudioConfig = {
 export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
   image,
   onBack,
+  onOpenSettingsModal,
+  language = 'bm',
+  themeMode = 'light',
 }) => {
   const [config, setConfig] = useState<TracingStudioConfig>(DEFAULT_CONFIG);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isSelected, setIsSelected] = useState(true);
+
+  const t = TRANSLATIONS[language];
 
   // Layout refs to measure image center for rotation
   const imageBoxRef = useRef<View>(null);
@@ -80,7 +89,6 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
       if (config.isLocked) return;
       setIsSelected(true);
 
-      // Store image box screen center for rotation
       if (imageBoxRef.current) {
         imageBoxRef.current.measureInWindow((x, y, w, h) => {
           imageCenterRef.current = { x: x + w / 2, y: y + h / 2 };
@@ -212,6 +220,9 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
           setIsSelected(false);
         }}
         onReset={handleReset}
+        onOpenSettingsModal={onOpenSettingsModal}
+        language={language}
+        themeMode={themeMode}
       />
 
       {/* Main Interactive Canvas Area */}
@@ -311,7 +322,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
               }}
             >
               <AppIcon name="lock" size={14} color="#FFFFFF" />
-              <Text style={styles.floatingCanvasLockText}>Lock Screen</Text>
+              <Text style={styles.floatingCanvasLockText}>{t.lockScreen}</Text>
             </TouchableOpacity>
           )}
 
@@ -333,12 +344,15 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
         config={config}
         onChangeConfig={handleUpdateConfig}
         isLocked={config.isLocked}
+        language={language}
+        themeMode={themeMode}
       />
 
       {/* Touch Lock Screen Overlay */}
       <TouchLockOverlay
         isLocked={config.isLocked}
         onUnlock={() => handleUpdateConfig({ isLocked: false })}
+        language={language}
       />
     </View>
   );

@@ -2,6 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AppIcon } from '@/components/AppIcon';
 import { ImageGridCard } from '@/components/ImageGridCard';
+import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
 
@@ -11,7 +12,10 @@ interface ImageGalleryScreenProps {
   onSelectImage: (image: TracingImage) => void;
   onBack: () => void;
   onOpenUploadModal: () => void;
+  onOpenSettingsModal: () => void;
   onDeleteImage?: (id: string) => void;
+  language?: Language;
+  themeMode?: ThemeMode;
 }
 
 export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
@@ -20,28 +24,69 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
   onSelectImage,
   onBack,
   onOpenUploadModal,
+  onOpenSettingsModal,
   onDeleteImage,
+  language = 'bm',
+  themeMode = 'light',
 }) => {
   const { columns, gap, paddingHorizontal, maxContainerWidth } = useResponsiveLayout();
+  const t = TRANSLATIONS[language];
+  const colors = COLOR_THEMES[themeMode];
+
+  const getCategoryTitle = () => {
+    if (category.id === 'uploads') return t.myUploadsTitle;
+    if (category.id === 'anime') return 'Anime & Chibi';
+    if (category.id === 'cartoon') return language === 'en' ? 'Cartoons' : 'Kartun';
+    if (category.id === 'fruit') return language === 'en' ? 'Fruits' : 'Buah-buahan';
+    if (category.id === 'animal') return language === 'en' ? 'Animals' : 'Haiwan';
+    return language === 'en' ? 'Others' : 'Lain-lain';
+  };
 
   return (
-    <View style={styles.screenContainer}>
+    <View style={[styles.screenContainer, { backgroundColor: colors.background }]}>
       {/* Top Navbar */}
-      <View style={styles.topNav}>
-        <TouchableOpacity style={styles.backBtn} onPress={onBack}>
-          <AppIcon name="arrow-left" size={14} color="#09090B" />
-          <Text style={styles.backText}>Kategori</Text>
+      <View
+        style={[
+          styles.topNav,
+          { backgroundColor: colors.cardBackground, borderBottomColor: colors.cardBorder },
+        ]}
+      >
+        <TouchableOpacity
+          style={[
+            styles.backBtn,
+            { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+          ]}
+          onPress={onBack}
+        >
+          <AppIcon name="arrow-left" size={14} color={colors.textPrimary} />
+          <Text style={[styles.backText, { color: colors.textPrimary }]}>{t.backToCategories}</Text>
         </TouchableOpacity>
 
         <View style={styles.categoryTitleGroup}>
-          <Text style={styles.categoryTitle}>{category.title}</Text>
-          <Text style={styles.categorySub}>{images.length} gambar tersedia</Text>
+          <Text style={[styles.categoryTitle, { color: colors.textPrimary }]}>
+            {getCategoryTitle()}
+          </Text>
+          <Text style={[styles.categorySub, { color: colors.textSecondary }]}>
+            {images.length} {t.imagesAvailable}
+          </Text>
         </View>
 
-        <TouchableOpacity style={styles.uploadBtn} onPress={onOpenUploadModal}>
-          <AppIcon name="plus" size={14} color="#FFFFFF" />
-          <Text style={styles.uploadText}>Upload</Text>
-        </TouchableOpacity>
+        <View style={styles.rightNavActions}>
+          <TouchableOpacity
+            style={[
+              styles.settingsBtn,
+              { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+            ]}
+            onPress={onOpenSettingsModal}
+          >
+            <AppIcon name="settings" size={14} color={colors.textPrimary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.uploadBtn} onPress={onOpenUploadModal}>
+            <AppIcon name="plus" size={14} color="#FFFFFF" />
+            <Text style={styles.uploadText}>{t.uploadButton}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Main Content */}
@@ -52,14 +97,16 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
         <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
           {images.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <AppIcon name="image" size={40} color="#A1A1AA" />
-              <Text style={styles.emptyTitle}>Tiada Gambar Dalam Kategori Ini</Text>
-              <Text style={styles.emptySub}>
-                Muat naik gambar pertama anda untuk mula menekap & melukis.
+              <AppIcon name="image" size={40} color={colors.textSecondary} />
+              <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
+                {t.noImagesTitle}
+              </Text>
+              <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
+                {t.noImagesSub}
               </Text>
               <TouchableOpacity style={styles.emptyUploadBtn} onPress={onOpenUploadModal}>
                 <AppIcon name="plus" size={14} color="#FFFFFF" />
-                <Text style={styles.emptyUploadText}>Muat Naik Gambar Sekarang</Text>
+                <Text style={styles.emptyUploadText}>{t.uploadNow}</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -72,6 +119,7 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
                       image={img}
                       onSelect={onSelectImage}
                       onDelete={onDeleteImage}
+                      themeMode={themeMode}
                     />
                   </View>
                 );
@@ -87,13 +135,10 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
 const styles = StyleSheet.create({
   screenContainer: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   topNav: {
     height: 60,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E4E7',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -104,9 +149,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#F4F4F5',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
@@ -114,7 +157,6 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#09090B',
   },
   categoryTitleGroup: {
     alignItems: 'center',
@@ -122,12 +164,20 @@ const styles = StyleSheet.create({
   categoryTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#09090B',
   },
   categorySub: {
     fontSize: 11,
-    color: '#71717A',
     fontWeight: '400',
+  },
+  rightNavActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  settingsBtn: {
+    padding: 7,
+    borderRadius: 8,
+    borderWidth: 1,
   },
   uploadBtn: {
     flexDirection: 'row',
@@ -164,11 +214,9 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#09090B',
   },
   emptySub: {
     fontSize: 12,
-    color: '#71717A',
     textAlign: 'center',
     maxWidth: 320,
   },

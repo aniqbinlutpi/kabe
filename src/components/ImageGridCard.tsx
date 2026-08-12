@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AppIcon } from '@/components/AppIcon';
+import { COLOR_THEMES, ThemeMode } from '@/constants/Translations';
 import { TracingImage } from '@/types/TracingTypes';
 
 interface ImageGridCardProps {
@@ -8,18 +9,28 @@ interface ImageGridCardProps {
   onSelect: (image: TracingImage) => void;
   onDelete?: (id: string) => void;
   cardWidth?: number;
+  themeMode?: ThemeMode;
 }
 
 export const ImageGridCard: React.FC<ImageGridCardProps> = ({
   image,
   onSelect,
   onDelete,
+  themeMode = 'light',
 }) => {
+  const colors = COLOR_THEMES[themeMode];
+
   return (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() => onSelect(image)}
-      style={styles.card}
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.cardBackground,
+          borderColor: colors.cardBorder,
+        },
+      ]}
     >
       <View style={styles.imageContainer}>
         <Image
@@ -46,11 +57,11 @@ export const ImageGridCard: React.FC<ImageGridCardProps> = ({
         )}
       </View>
 
-      <View style={styles.infoArea}>
-        <Text style={styles.title} numberOfLines={1}>
+      <View style={[styles.infoArea, { backgroundColor: colors.cardBackground }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={1}>
           {image.title}
         </Text>
-        <Text style={styles.actionText}>Tekap & Lukis →</Text>
+        <Text style={[styles.actionText, { color: colors.textSecondary }]}>Tekap & Lukis →</Text>
       </View>
     </TouchableOpacity>
   );
@@ -58,11 +69,9 @@ export const ImageGridCard: React.FC<ImageGridCardProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
   },
   imageContainer: {
     width: '100%',
@@ -105,16 +114,13 @@ const styles = StyleSheet.create({
   infoArea: {
     padding: 10,
     gap: 2,
-    backgroundColor: '#FFFFFF',
   },
   title: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#09090B',
   },
   actionText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#71717A',
   },
 });

@@ -1,75 +1,113 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AppIcon } from '@/components/AppIcon';
+import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { FilterMode, TracingStudioConfig } from '@/types/TracingTypes';
 
 interface TracingToolbarProps {
   config: TracingStudioConfig;
   onChangeConfig: (newConfig: Partial<TracingStudioConfig>) => void;
   isLocked: boolean;
+  language?: Language;
+  themeMode?: ThemeMode;
 }
 
 export const TracingToolbar: React.FC<TracingToolbarProps> = ({
   config,
   onChangeConfig,
   isLocked,
+  language = 'bm',
+  themeMode = 'light',
 }) => {
   if (isLocked) {
     return null; // Toolbar hidden when screen is locked for tracing
   }
 
+  const t = TRANSLATIONS[language];
+  const colors = COLOR_THEMES[themeMode];
+
   const filters: { id: FilterMode; label: string }[] = [
-    { id: 'normal', label: 'Asal' },
-    { id: 'lineArt', label: 'Garisan (Line Art)' },
-    { id: 'invert', label: 'Invert B/W' },
+    { id: 'normal', label: t.filterOriginal },
+    { id: 'lineArt', label: t.filterLineArt },
+    { id: 'invert', label: t.filterInvert },
   ];
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.cardBackground, borderTopColor: colors.cardBorder },
+      ]}
+    >
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Zoom Controls */}
         <View style={styles.sectionGroup}>
-          <Text style={styles.groupLabel}>Saiz (Zoom)</Text>
+          <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>{t.sizeZoom}</Text>
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={styles.toolBtn}
+              style={[
+                styles.toolBtn,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+              ]}
               onPress={() => onChangeConfig({ scale: Math.max(0.2, config.scale - 0.2) })}
             >
-              <Text style={styles.toolBtnText}>−</Text>
+              <Text style={[styles.toolBtnText, { color: colors.textPrimary }]}>−</Text>
             </TouchableOpacity>
-            <Text style={styles.valueText}>{Math.round(config.scale * 100)}%</Text>
+
+            <Text style={[styles.valueText, { color: colors.textPrimary }]}>
+              {Math.round(config.scale * 100)}%
+            </Text>
+
             <TouchableOpacity
-              style={styles.toolBtn}
+              style={[
+                styles.toolBtn,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+              ]}
               onPress={() => onChangeConfig({ scale: Math.min(6.0, config.scale + 0.2) })}
             >
-              <Text style={styles.toolBtnText}>+</Text>
+              <Text style={[styles.toolBtnText, { color: colors.textPrimary }]}>+</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Rotate & Flip */}
         <View style={styles.sectionGroup}>
-          <Text style={styles.groupLabel}>Putar & Flip</Text>
+          <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>{t.rotateAndFlip}</Text>
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={styles.toolBtn}
+              style={[
+                styles.toolBtn,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+              ]}
               onPress={() => onChangeConfig({ rotation: (config.rotation + 90) % 360 })}
             >
-              <AppIcon name="reset" size={12} color="#09090B" />
-              <Text style={styles.toolBtnText}> 90°</Text>
+              <AppIcon name="reset" size={12} color={colors.textPrimary} />
+              <Text style={[styles.toolBtnText, { color: colors.textPrimary }]}>{t.rotateStep}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.toolBtn, config.flipHorizontal && styles.activeBtn]}
+              style={[
+                styles.toolBtn,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+                config.flipHorizontal && {
+                  backgroundColor: colors.darkButtonBackground,
+                  borderColor: colors.darkButtonBackground,
+                },
+              ]}
               onPress={() => onChangeConfig({ flipHorizontal: !config.flipHorizontal })}
             >
               <AppIcon
                 name="flip"
                 size={12}
-                color={config.flipHorizontal ? '#FFFFFF' : '#09090B'}
+                color={config.flipHorizontal ? colors.darkButtonText : colors.textPrimary}
               />
-              <Text style={[styles.toolBtnText, config.flipHorizontal && styles.activeBtnText]}>
-                Flip
+              <Text
+                style={[
+                  styles.toolBtnText,
+                  { color: config.flipHorizontal ? colors.darkButtonText : colors.textPrimary },
+                ]}
+              >
+                {t.flip}
               </Text>
             </TouchableOpacity>
           </View>
@@ -77,39 +115,64 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
 
         {/* Brightness Controls */}
         <View style={styles.sectionGroup}>
-          <Text style={styles.groupLabel}>Kecerahan Skrin</Text>
+          <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>{t.screenBrightness}</Text>
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={styles.toolBtn}
+              style={[
+                styles.toolBtn,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+              ]}
               onPress={() => onChangeConfig({ brightness: Math.max(0.3, config.brightness - 0.2) })}
             >
-              <AppIcon name="moon" size={13} color="#09090B" />
+              <AppIcon name="moon" size={13} color={colors.textPrimary} />
             </TouchableOpacity>
-            <Text style={styles.valueText}>{Math.round(config.brightness * 100)}%</Text>
+
+            <Text style={[styles.valueText, { color: colors.textPrimary }]}>
+              {Math.round(config.brightness * 100)}%
+            </Text>
+
             <TouchableOpacity
-              style={styles.toolBtn}
+              style={[
+                styles.toolBtn,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+              ]}
               onPress={() => onChangeConfig({ brightness: Math.min(2.0, config.brightness + 0.2) })}
             >
-              <AppIcon name="sun" size={13} color="#09090B" />
+              <AppIcon name="sun" size={13} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
         </View>
 
         {/* Filter Modes */}
         <View style={styles.sectionGroup}>
-          <Text style={styles.groupLabel}>Mode Tekap (Filter)</Text>
+          <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>{t.tracingMode}</Text>
           <View style={styles.buttonRow}>
-            {filters.map((f) => (
-              <TouchableOpacity
-                key={f.id}
-                style={[styles.chipBtn, config.filterMode === f.id && styles.activeChip]}
-                onPress={() => onChangeConfig({ filterMode: f.id })}
-              >
-                <Text style={[styles.chipText, config.filterMode === f.id && styles.activeChipText]}>
-                  {f.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {filters.map((f) => {
+              const isActive = config.filterMode === f.id;
+              return (
+                <TouchableOpacity
+                  key={f.id}
+                  style={[
+                    styles.chipBtn,
+                    { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+                    isActive && {
+                      backgroundColor: colors.darkButtonBackground,
+                      borderColor: colors.darkButtonBackground,
+                    },
+                  ]}
+                  onPress={() => onChangeConfig({ filterMode: f.id })}
+                >
+                  <Text
+                    style={[
+                      styles.chipText,
+                      { color: isActive ? colors.darkButtonText : colors.textPrimary },
+                    ]}
+                  >
+                    {f.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
       </ScrollView>
@@ -119,9 +182,7 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
-    borderTopColor: '#E4E4E7',
     paddingVertical: 10,
     zIndex: 100,
   },
@@ -137,7 +198,6 @@ const styles = StyleSheet.create({
   groupLabel: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#71717A',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -148,9 +208,7 @@ const styles = StyleSheet.create({
   },
   toolBtn: {
     flexDirection: 'row',
-    backgroundColor: '#F4F4F5',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
     paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 8,
@@ -162,26 +220,15 @@ const styles = StyleSheet.create({
   toolBtnText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#09090B',
-  },
-  activeBtn: {
-    backgroundColor: '#09090B',
-    borderColor: '#09090B',
-  },
-  activeBtnText: {
-    color: '#FFFFFF',
   },
   valueText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#09090B',
     minWidth: 40,
     textAlign: 'center',
   },
   chipBtn: {
-    backgroundColor: '#F4F4F5',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
@@ -189,14 +236,5 @@ const styles = StyleSheet.create({
   chipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#52525B',
-  },
-  activeChip: {
-    backgroundColor: '#09090B',
-    borderColor: '#09090B',
-  },
-  activeChipText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
   },
 });

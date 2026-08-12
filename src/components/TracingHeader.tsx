@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AppIcon } from '@/components/AppIcon';
+import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 
 interface TracingHeaderProps {
   title: string;
@@ -8,6 +9,9 @@ interface TracingHeaderProps {
   onBack: () => void;
   onToggleLock: () => void;
   onReset: () => void;
+  onOpenSettingsModal?: () => void;
+  language?: Language;
+  themeMode?: ThemeMode;
 }
 
 export const TracingHeader: React.FC<TracingHeaderProps> = ({
@@ -16,31 +20,69 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
   onBack,
   onToggleLock,
   onReset,
+  onOpenSettingsModal,
+  language = 'bm',
+  themeMode = 'light',
 }) => {
   if (isLocked) {
     return null; // Header hidden when screen is locked for paper tracing
   }
 
+  const t = TRANSLATIONS[language];
+  const colors = COLOR_THEMES[themeMode];
+
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.iconButton} onPress={onBack}>
-        <AppIcon name="arrow-left" size={14} color="#09090B" />
-        <Text style={styles.backText}>Kembali</Text>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.cardBackground, borderBottomColor: colors.cardBorder },
+      ]}
+    >
+      <TouchableOpacity
+        style={[
+          styles.iconButton,
+          { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+        ]}
+        onPress={onBack}
+      >
+        <AppIcon name="arrow-left" size={14} color={colors.textPrimary} />
+        <Text style={[styles.backText, { color: colors.textPrimary }]}>{t.back}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.title} numberOfLines={1}>
+      <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={1}>
         {title}
       </Text>
 
       <View style={styles.rightActions}>
-        <TouchableOpacity style={styles.resetButton} onPress={onReset}>
-          <AppIcon name="reset" size={12} color="#09090B" />
-          <Text style={styles.resetText}>Reset</Text>
+        {onOpenSettingsModal && (
+          <TouchableOpacity
+            style={[
+              styles.resetButton,
+              { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+            ]}
+            onPress={onOpenSettingsModal}
+          >
+            <AppIcon name="settings" size={13} color={colors.textPrimary} />
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          style={[
+            styles.resetButton,
+            { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+          ]}
+          onPress={onReset}
+        >
+          <AppIcon name="reset" size={12} color={colors.textPrimary} />
+          <Text style={[styles.resetText, { color: colors.textPrimary }]}>{t.reset}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.lockButton} onPress={onToggleLock}>
-          <AppIcon name="lock" size={12} color="#FFFFFF" />
-          <Text style={styles.lockText}>Kunci Skrin</Text>
+        <TouchableOpacity
+          style={[styles.lockButton, { backgroundColor: colors.darkButtonBackground }]}
+          onPress={onToggleLock}
+        >
+          <AppIcon name="lock" size={12} color={colors.darkButtonText} />
+          <Text style={[styles.lockText, { color: colors.darkButtonText }]}>{t.lockScreen}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -50,9 +92,7 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
 const styles = StyleSheet.create({
   container: {
     height: 60,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E4E4E7',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -67,20 +107,16 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: 10,
     borderRadius: 8,
-    backgroundColor: '#F4F4F5',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
   },
   backText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#09090B',
   },
   title: {
     flex: 1,
     fontSize: 14,
     fontWeight: '800',
-    color: '#09090B',
     textAlign: 'center',
     paddingHorizontal: 4,
   },
@@ -96,26 +132,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 7,
     borderRadius: 8,
-    backgroundColor: '#F4F4F5',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
   },
   resetText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#09090B',
   },
   lockButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#09090B',
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 8,
   },
   lockText: {
-    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '800',
   },

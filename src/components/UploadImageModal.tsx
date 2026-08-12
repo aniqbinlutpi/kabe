@@ -10,29 +10,36 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { AppIcon } from '@/components/AppIcon';
+import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 
 interface UploadImageModalProps {
   visible: boolean;
   onClose: () => void;
   onImageUploaded: (title: string, uri: string) => void;
+  language?: Language;
+  themeMode?: ThemeMode;
 }
 
 export const UploadImageModal: React.FC<UploadImageModalProps> = ({
   visible,
   onClose,
   onImageUploaded,
+  language = 'bm',
+  themeMode = 'light',
 }) => {
   const [title, setTitle] = useState('');
   const [selectedUri, setSelectedUri] = useState<string | null>(null);
   const [urlInput, setUrlInput] = useState('');
   const [useUrl, setUseUrl] = useState(false);
 
-  // Native Image Picker (iOS & Android Photo Gallery)
+  const t = TRANSLATIONS[language];
+  const colors = COLOR_THEMES[themeMode];
+
   const handlePickFromGallery = async () => {
     try {
       const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!permission.granted) {
-        alert('Kebenaran galeri diperlukan untuk memilih gambar dari peranti anda.');
+        alert(t.alertSelectImage);
         return;
       }
 
@@ -50,7 +57,6 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
     }
   };
 
-  // Web File Picker Fallback
   const handleWebFileChange = (e: any) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -66,10 +72,10 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
 
   const handleSubmit = () => {
     const finalUri = useUrl ? urlInput.trim() : selectedUri;
-    const finalTitle = title.trim() || 'Lukisan Saya';
+    const finalTitle = title.trim() || 'My Drawing';
 
     if (!finalUri) {
-      alert('Sila pilih gambar dari galeri peranti!');
+      alert(t.alertSelectImage);
       return;
     }
 
@@ -85,65 +91,127 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.backdrop}>
-        <View style={styles.modalCard}>
+        <View
+          style={[
+            styles.modalCard,
+            { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
+          ]}
+        >
           <View style={styles.titleGroup}>
-            <AppIcon name="image" size={20} color="#09090B" />
-            <Text style={styles.modalTitle}>Muat Naik Gambar Baru</Text>
+            <AppIcon name="image" size={20} color={colors.textPrimary} />
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+              {t.uploadModalTitle}
+            </Text>
           </View>
-          <Text style={styles.modalSub}>
-            Pilih gambar dari galeri peranti untuk dijadikan corak tekap lukisan.
+          <Text style={[styles.modalSub, { color: colors.textSecondary }]}>
+            {t.uploadModalSub}
           </Text>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Tajuk Lukisan</Text>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>
+              {t.drawingTitleLabel}
+            </Text>
             <TextInput
-              style={styles.textInput}
-              placeholder="Contoh: Lukisan Kucing Saya"
+              style={[
+                styles.textInput,
+                {
+                  backgroundColor: colors.buttonBackground,
+                  borderColor: colors.buttonBorder,
+                  color: colors.textPrimary,
+                },
+              ]}
+              placeholder={t.drawingTitlePlaceholder}
               value={title}
               onChangeText={setTitle}
-              placeholderTextColor="#A1A1AA"
+              placeholderTextColor={colors.textSecondary}
             />
           </View>
 
-          <View style={styles.tabToggle}>
+          <View
+            style={[
+              styles.tabToggle,
+              { backgroundColor: colors.buttonBackground },
+            ]}
+          >
             <TouchableOpacity
-              style={[styles.toggleBtn, !useUrl && styles.toggleBtnActive]}
+              style={[
+                styles.toggleBtn,
+                !useUrl && {
+                  backgroundColor: colors.cardBackground,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                },
+              ]}
               onPress={() => setUseUrl(false)}
             >
               <View style={styles.tabContent}>
-                <AppIcon name="image" size={14} color={!useUrl ? '#09090B' : '#71717A'} />
-                <Text style={[styles.toggleText, !useUrl && styles.toggleTextActive]}>
-                  Galeri Peranti
+                <AppIcon
+                  name="image"
+                  size={14}
+                  color={!useUrl ? colors.textPrimary : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.toggleText,
+                    { color: !useUrl ? colors.textPrimary : colors.textSecondary },
+                  ]}
+                >
+                  {t.deviceGalleryTab}
                 </Text>
               </View>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.toggleBtn, useUrl && styles.toggleBtnActive]}
+              style={[
+                styles.toggleBtn,
+                useUrl && {
+                  backgroundColor: colors.cardBackground,
+                  borderWidth: 1,
+                  borderColor: colors.cardBorder,
+                },
+              ]}
               onPress={() => setUseUrl(true)}
             >
               <View style={styles.tabContent}>
-                <AppIcon name="link" size={14} color={useUrl ? '#09090B' : '#71717A'} />
-                <Text style={[styles.toggleText, useUrl && styles.toggleTextActive]}>
-                  URL Gambar
+                <AppIcon
+                  name="link"
+                  size={14}
+                  color={useUrl ? colors.textPrimary : colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.toggleText,
+                    { color: useUrl ? colors.textPrimary : colors.textSecondary },
+                  ]}
+                >
+                  {t.imageUrlTab}
                 </Text>
               </View>
             </TouchableOpacity>
           </View>
 
           {!useUrl ? (
-            <View style={styles.pickerBox}>
+            <View
+              style={[
+                styles.pickerBox,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+              ]}
+            >
               {selectedUri ? (
                 <View style={styles.previewContainer}>
                   <View style={styles.tagGroup}>
-                    <AppIcon name="check" size={14} color="#09090B" />
-                    <Text style={styles.previewTag}>Gambar Dipilih Dari Galeri</Text>
+                    <AppIcon name="check" size={14} color={colors.textPrimary} />
+                    <Text style={[styles.previewTag, { color: colors.textPrimary }]}>
+                      {t.imageSelectedTag}
+                    </Text>
                   </View>
                   <TouchableOpacity
-                    style={styles.repickBtn}
+                    style={[styles.repickBtn, { backgroundColor: colors.buttonBorder }]}
                     onPress={() => setSelectedUri(null)}
                   >
-                    <Text style={styles.repickText}>Tukar Gambar</Text>
+                    <Text style={[styles.repickText, { color: colors.textPrimary }]}>
+                      {t.changeImageBtn}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -152,8 +220,8 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
                     <label
                       style={{
                         cursor: 'pointer',
-                        backgroundColor: '#09090B',
-                        color: '#FFFFFF',
+                        backgroundColor: colors.darkButtonBackground,
+                        color: colors.darkButtonText,
                         padding: '10px 16px',
                         borderRadius: '8px',
                         fontSize: '13px',
@@ -163,7 +231,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
                         gap: '8px',
                       } as any}
                     >
-                      <span>Buka Galeri Gambar</span>
+                      <span>{t.openGalleryBtn}</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -173,11 +241,13 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
                     </label>
                   ) : (
                     <TouchableOpacity
-                      style={styles.pickImageBtn}
+                      style={[styles.pickImageBtn, { backgroundColor: colors.darkButtonBackground }]}
                       onPress={handlePickFromGallery}
                     >
-                      <AppIcon name="folder" size={14} color="#FFFFFF" />
-                      <Text style={styles.pickImageText}>Buka Galeri Gambar</Text>
+                      <AppIcon name="folder" size={14} color={colors.darkButtonText} />
+                      <Text style={[styles.pickImageText, { color: colors.darkButtonText }]}>
+                        {t.openGalleryBtn}
+                      </Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -185,24 +255,44 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
             </View>
           ) : (
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>URL Gambar Direct (https://...)</Text>
+              <Text style={[styles.label, { color: colors.textPrimary }]}>
+                {t.enterUrlLabel}
+              </Text>
               <TextInput
-                style={styles.textInput}
+                style={[
+                  styles.textInput,
+                  {
+                    backgroundColor: colors.buttonBackground,
+                    borderColor: colors.buttonBorder,
+                    color: colors.textPrimary,
+                  },
+                ]}
                 placeholder="https://images.unsplash.com/photo-..."
                 value={urlInput}
                 onChangeText={setUrlInput}
-                placeholderTextColor="#A1A1AA"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
           )}
 
           <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
-              <Text style={styles.cancelText}>Batal</Text>
+            <TouchableOpacity
+              style={[
+                styles.cancelBtn,
+                { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
+              ]}
+              onPress={onClose}
+            >
+              <Text style={[styles.cancelText, { color: colors.textPrimary }]}>{t.cancel}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
-              <Text style={styles.submitText}>Simpan & Tekap</Text>
+            <TouchableOpacity
+              style={[styles.submitBtn, { backgroundColor: colors.darkButtonBackground }]}
+              onPress={handleSubmit}
+            >
+              <Text style={[styles.submitText, { color: colors.darkButtonText }]}>
+                {t.saveAndTrace}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -220,10 +310,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E4E4E7',
     padding: 24,
     width: '100%',
     maxWidth: 460,
@@ -237,11 +325,9 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#09090B',
   },
   modalSub: {
     fontSize: 12,
-    color: '#71717A',
     marginTop: -8,
   },
   inputGroup: {
@@ -250,22 +336,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#09090B',
     textTransform: 'uppercase',
   },
   textInput: {
-    backgroundColor: '#FAFAFA',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 9,
     fontSize: 13,
-    color: '#09090B',
   },
   tabToggle: {
     flexDirection: 'row',
-    backgroundColor: '#F4F4F5',
     borderRadius: 8,
     padding: 3,
   },
@@ -275,11 +356,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 6,
   },
-  toggleBtnActive: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E4E4E7',
-  },
   tabContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -288,22 +364,15 @@ const styles = StyleSheet.create({
   toggleText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#71717A',
-  },
-  toggleTextActive: {
-    color: '#09090B',
-    fontWeight: '700',
   },
   pickerBox: {
     minHeight: 80,
     borderWidth: 1,
-    borderColor: '#D4D4D8',
     borderStyle: 'dashed',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#FAFAFA',
   },
   uploadArea: {
     alignItems: 'center',
@@ -313,13 +382,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#09090B',
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
   },
   pickImageText: {
-    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '700',
   },
@@ -333,20 +400,17 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   previewTag: {
-    color: '#09090B',
     fontWeight: '800',
     fontSize: 13,
   },
   repickBtn: {
     paddingHorizontal: 12,
     paddingVertical: 5,
-    backgroundColor: '#E4E4E7',
     borderRadius: 6,
   },
   repickText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#09090B',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -358,24 +422,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 8,
-    backgroundColor: '#F4F4F5',
     borderWidth: 1,
-    borderColor: '#E4E4E7',
   },
   cancelText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#09090B',
   },
   submitBtn: {
     paddingHorizontal: 16,
     paddingVertical: 9,
     borderRadius: 8,
-    backgroundColor: '#09090B',
   },
   submitText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#FFFFFF',
   },
 });
