@@ -53,9 +53,9 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
           { backgroundColor: colors.background, borderBottomColor: colors.cardBorder },
         ]}
       >
+        {/* Flat Back Icon Button Only (No Text Wording) */}
         <Pressable style={styles.flatBackBtn} onPress={onBack}>
-          <AppIcon name="arrow-left" size={16} color={colors.textPrimary} />
-          <Text style={[styles.backText, { color: colors.textPrimary }]}>{t.backToCategories}</Text>
+          <AppIcon name="arrow-left" size={18} color={colors.textPrimary} />
         </Pressable>
 
         <View style={styles.categoryTitleGroup}>
@@ -150,15 +150,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   flatBackBtn: {
-    flexDirection: 'row',
+    padding: 8,
+    paddingLeft: 0,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-    paddingRight: 8,
-  },
-  backText: {
-    fontSize: 14,
-    fontWeight: '700',
   },
   categoryTitleGroup: {
     alignItems: 'center',

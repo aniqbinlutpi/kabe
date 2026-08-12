@@ -38,10 +38,9 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
         { backgroundColor: colors.background, borderBottomColor: colors.cardBorder },
       ]}
     >
-      {/* Flat Back Button (No Grey Box!) */}
+      {/* Flat Back Arrow Icon Only (No Text Wording) */}
       <TouchableOpacity style={styles.flatIconButton} onPress={onBack}>
-        <AppIcon name="arrow-left" size={16} color={colors.textPrimary} />
-        <Text style={[styles.backText, { color: colors.textPrimary }]}>{t.back}</Text>
+        <AppIcon name="arrow-left" size={18} color={colors.textPrimary} />
       </TouchableOpacity>
 
       <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={1}>
@@ -84,15 +83,10 @@ const styles = StyleSheet.create({
     zIndex: 100,
   },
   flatIconButton: {
-    flexDirection: 'row',
+    padding: 8,
+    paddingLeft: 0,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-    paddingRight: 8,
-  },
-  backText: {
-    fontSize: 14,
-    fontWeight: '700',
   },
   title: {
     flex: 1,
