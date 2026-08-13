@@ -8,6 +8,8 @@ import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Tra
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
 
+import { KabeLogo } from '@/components/KabeLogo';
+
 interface CategorySelectionScreenProps {
   onSelectCategory: (category: CategoryItem) => void;
   onOpenUploadModal: () => void;
@@ -52,7 +54,7 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
         ]}
       >
         <View style={[styles.stickyHeaderContent, { maxWidth: maxContainerWidth, paddingHorizontal }]}>
-          <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>Ketah Kabe</Text>
+          <KabeLogo textColor={colors.textPrimary} size="md" />
 
           <Pressable style={styles.flatSettingsIconBtn} onPress={onOpenSettingsModal}>
             <AppIcon name="settings" size={18} color={colors.textPrimary} />
