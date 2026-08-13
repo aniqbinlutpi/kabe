@@ -23,6 +23,38 @@ interface AnimatedSplashScreenProps {
 const logoSource = require('../../assets/images/k-icon-nobg.png');
 const videoSource = require('../../assets/videos/animation-k.mp4');
 
+function VideoSplashView({ onFinish, animatedContainerStyle }: { onFinish: () => void; animatedContainerStyle: any }) {
+  const player = useVideoPlayer(videoSource, (p) => {
+    p.loop = false;
+  });
+
+  useEffect(() => {
+    if (!player) return;
+    try {
+      player.play();
+
+      const subscription = player.addListener('playToEnd', () => {
+        onFinish();
+      });
+
+      const fallbackTimer = setTimeout(() => {
+        onFinish();
+      }, 6000);
+
+      return () => {
+        subscription.remove();
+        clearTimeout(fallbackTimer);
+      };
+    } catch (e) {}
+  }, [player]);
+
+  return (
+    <Animated.View style={[styles.container, { backgroundColor: '#000000' }, animatedContainerStyle]}>
+      <VideoView player={player} style={styles.video} nativeControls={false} contentFit="cover" />
+    </Animated.View>
+  );
+}
+
 export function AnimatedSplashScreen({ onFinish, mode = 'minimalist' }: AnimatedSplashScreenProps) {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
@@ -47,11 +79,6 @@ export function AnimatedSplashScreen({ onFinish, mode = 'minimalist' }: Animated
   const eY = useSharedValue(20);
   const eScale = useSharedValue(0);
   const eOpacity = useSharedValue(0);
-
-  // Video player setup (fallback mode)
-  const player = useVideoPlayer(videoSource, (p) => {
-    p.loop = false;
-  });
 
   useEffect(() => {
     // Hide native splash screen immediately
@@ -138,25 +165,6 @@ export function AnimatedSplashScreen({ onFinish, mode = 'minimalist' }: Animated
       return () => {
         isMounted = false;
       };
-    } else {
-      player.play();
-
-      const subscription = player.addListener('playToEnd', () => {
-        containerOpacity.value = withTiming(0, { duration: 350 }, (finished) => {
-          if (finished) runOnJS(onFinish)();
-        });
-      });
-
-      const fallbackTimer = setTimeout(() => {
-        containerOpacity.value = withTiming(0, { duration: 350 }, (finished) => {
-          if (finished) runOnJS(onFinish)();
-        });
-      }, 6000);
-
-      return () => {
-        subscription.remove();
-        clearTimeout(fallbackTimer);
-      };
     }
   }, [mode]);
 
@@ -193,11 +201,7 @@ export function AnimatedSplashScreen({ onFinish, mode = 'minimalist' }: Animated
   const accentColor = '#208AEF';
 
   if (mode === 'video') {
-    return (
-      <Animated.View style={[styles.container, { backgroundColor: '#000000' }, animatedContainerStyle]}>
-        <VideoView player={player} style={styles.video} nativeControls={false} contentFit="cover" />
-      </Animated.View>
-    );
+    return <VideoSplashView onFinish={onFinish} animatedContainerStyle={animatedContainerStyle} />;
   }
 
   return (

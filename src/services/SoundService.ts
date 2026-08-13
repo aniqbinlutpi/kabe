@@ -11,26 +11,31 @@ try {
 class SoundEffectsService {
   private soundEnabled: boolean = true;
   private player: any = null;
+  private isInitialized: boolean = false;
 
   constructor() {
-    this.initAudio();
+    // Lazy initialize on first play to prevent startup crash on Android
   }
 
   private async initAudio() {
-    if (Platform.OS === 'web') return;
+    if (Platform.OS === 'web' || this.isInitialized) return;
+    this.isInitialized = true;
 
     try {
-      await setIsAudioActiveAsync(true);
-      await setAudioModeAsync({
-        playsInSilentMode: true,
-      });
-
-      this.player = createAudioPlayer(popSoundAsset);
-      if (this.player) {
-        this.player.volume = 1.0;
+      if (typeof setIsAudioActiveAsync === 'function') {
+        await setIsAudioActiveAsync(true).catch(() => {});
+      }
+      if (typeof setAudioModeAsync === 'function') {
+        await setAudioModeAsync({ playsInSilentMode: true }).catch(() => {});
+      }
+      if (typeof createAudioPlayer === 'function') {
+        this.player = createAudioPlayer(popSoundAsset);
+        if (this.player) {
+          this.player.volume = 1.0;
+        }
       }
     } catch (e) {
-      // Ignore background initialization errors
+      // Catch native audio setup errors safely
     }
   }
 
@@ -44,6 +49,10 @@ class SoundEffectsService {
 
   public async playPop() {
     if (!this.soundEnabled) return;
+
+    if (Platform.OS !== 'web' && !this.isInitialized) {
+      await this.initAudio().catch(() => {});
+    }
 
     // 1. Ensure audio session is active on native mobile
     if (Platform.OS !== 'web') {

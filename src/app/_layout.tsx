@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useColorScheme, View, StyleSheet } from 'react-native';
 import { AnimatedSplashScreen } from '../components/AnimatedSplashScreen';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [splashAnimationFinished, setSplashAnimationFinished] = useState(false);
+
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync().catch(() => {});
+  }, []);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

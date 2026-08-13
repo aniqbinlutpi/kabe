@@ -1,5 +1,4 @@
-import { File, Paths } from 'expo-file-system';
-import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Language, ThemeMode } from '@/constants/Translations';
 import { TracingImage } from '@/types/TracingTypes';
 
@@ -11,18 +10,11 @@ const HAS_SEEN_WIZARD_KEY = 'ketah_kabe_wizard_seen_v1';
 const memoryStorage: Record<string, string> = {};
 
 async function getItemSafe(key: string): Promise<string | null> {
-  // 1. Try reading from permanent disk FileSystem on native mobile
-  if (Platform.OS !== 'web' && File && Paths) {
-    try {
-      const sanitizedKey = key.replace(/[^a-zA-Z0-9_]/g, '_');
-      const file = new File(Paths.document, `${sanitizedKey}.json`);
-      if (file.exists) {
-        return await file.text();
-      }
-    } catch (e) {}
-  }
+  try {
+    const val = await AsyncStorage.getItem(key);
+    if (val !== null) return val;
+  } catch (e) {}
 
-  // 2. Web localStorage fallback
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
       return window.localStorage.getItem(key);
@@ -33,17 +25,11 @@ async function getItemSafe(key: string): Promise<string | null> {
 }
 
 async function setItemSafe(key: string, value: string): Promise<void> {
-  // 1. Try writing to permanent disk FileSystem on native mobile
-  if (Platform.OS !== 'web' && File && Paths) {
-    try {
-      const sanitizedKey = key.replace(/[^a-zA-Z0-9_]/g, '_');
-      const file = new File(Paths.document, `${sanitizedKey}.json`);
-      await file.write(value);
-      return;
-    } catch (e) {}
-  }
+  try {
+    await AsyncStorage.setItem(key, value);
+    return;
+  } catch (e) {}
 
-  // 2. Web localStorage fallback
   try {
     if (typeof window !== 'undefined' && window.localStorage) {
       window.localStorage.setItem(key, value);
