@@ -57,7 +57,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
     return language === 'en' ? 'Vehicles & Physical Objects' : 'Kenderaan & Objek Fizikal';
   };
 
-  const badgeText = category.id === 'uploads' ? t.myUploadsBadge : category.badgeText;
+  const badgeText = category.badgeText;
 
   return (
     <Animated.View style={animatedStyle}>
@@ -76,8 +76,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         ]}
       >
         <View style={styles.topSection}>
-          <View style={styles.badgeWrapper}>
-            {badgeText ? (
+          {badgeText ? (
+            <View style={styles.badgeWrapper}>
               <View
                 style={[
                   styles.badge,
@@ -96,8 +96,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                   {badgeText}
                 </Text>
               </View>
-            ) : null}
-          </View>
+            </View>
+          ) : null}
 
           <Text
             style={[
@@ -139,7 +139,9 @@ const styles = StyleSheet.create({
   cardContainer: {
     flex: 1,
     borderRadius: 16,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 14,
     justifyContent: 'space-between',
     borderWidth: 1,
     overflow: 'hidden',

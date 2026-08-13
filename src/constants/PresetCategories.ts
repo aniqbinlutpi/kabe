@@ -42,7 +42,6 @@ export const CATEGORIES: CategoryItem[] = [
     subtitle: 'Koleksi Gambar Sendiri',
     iconName: 'cloud-upload-outline',
     gradientColors: ['#09090B', '#18181B'],
-    badgeText: 'Gambar Sendiri',
   },
 ];
 
