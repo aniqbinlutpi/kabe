@@ -17,7 +17,8 @@ export type IconName =
   | 'folder'
   | 'check'
   | 'settings'
-  | 'globe';
+  | 'globe'
+  | 'github';
 
 interface AppIconProps {
   name: IconName;
@@ -457,6 +458,43 @@ export const AppIcon: React.FC<AppIconProps> = ({
               marginTop: -2,
             }}
           />
+        </View>
+      );
+
+    case 'github':
+      return (
+        <View style={[styles.box, { width: size, height: size }]}>
+          <View
+            style={{
+              width: size * 0.85,
+              height: size * 0.85,
+              borderRadius: (size * 0.85) / 2,
+              backgroundColor: color,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <View
+              style={{
+                width: size * 0.45,
+                height: size * 0.45,
+                borderRadius: (size * 0.45) / 2,
+                backgroundColor: color === '#FFFFFF' ? '#09090B' : '#FFFFFF',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <View
+                style={{
+                  width: size * 0.28,
+                  height: size * 0.25,
+                  borderTopLeftRadius: size * 0.12,
+                  borderTopRightRadius: size * 0.12,
+                  backgroundColor: color,
+                }}
+              />
+            </View>
+          </View>
         </View>
       );
 

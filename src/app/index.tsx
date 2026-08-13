@@ -95,6 +95,7 @@ export default function RootApp() {
         {activeView === 'categories' && (
           <CategorySelectionScreen
             onSelectCategory={handleSelectCategory}
+            onSelectImage={handleSelectImage}
             onOpenUploadModal={() => setIsUploadModalOpen(true)}
             onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
             customImages={customImages}

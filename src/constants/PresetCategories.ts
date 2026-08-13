@@ -68,6 +68,20 @@ export const PRESET_IMAGES: TracingImage[] = [
     uri: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80',
     aspectRatio: 1.0,
   },
+  {
+    id: 'anime-4',
+    title: 'Karakter Rubah Neon',
+    categoryId: 'anime',
+    uri: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
+  {
+    id: 'anime-5',
+    title: 'Wira Fantasy Chibi',
+    categoryId: 'anime',
+    uri: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
 
   // Cartoon
   {
@@ -89,6 +103,20 @@ export const PRESET_IMAGES: TracingImage[] = [
     title: 'Kelinci Comel',
     categoryId: 'cartoon',
     uri: 'https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
+  {
+    id: 'cartoon-4',
+    title: 'Anak Anjing Kartun',
+    categoryId: 'cartoon',
+    uri: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
+  {
+    id: 'cartoon-5',
+    title: 'Itik Comel',
+    categoryId: 'cartoon',
+    uri: 'https://images.unsplash.com/photo-1563281577-a7be47e20db9?w=800&auto=format&fit=crop&q=80',
     aspectRatio: 1.0,
   },
 
@@ -114,6 +142,20 @@ export const PRESET_IMAGES: TracingImage[] = [
     uri: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=800&auto=format&fit=crop&q=80',
     aspectRatio: 1.0,
   },
+  {
+    id: 'fruit-4',
+    title: 'Nenas Manis',
+    categoryId: 'fruit',
+    uri: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
+  {
+    id: 'fruit-5',
+    title: 'Tembikai Segar',
+    categoryId: 'fruit',
+    uri: 'https://images.unsplash.com/photo-1587049352847-81a56d773cae?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
 
   // Haiwan
   {
@@ -137,6 +179,20 @@ export const PRESET_IMAGES: TracingImage[] = [
     uri: 'https://images.unsplash.com/photo-1543549790-8b5f4a028cfb?w=800&auto=format&fit=crop&q=80',
     aspectRatio: 1.0,
   },
+  {
+    id: 'animal-4',
+    title: 'Singa Wira',
+    categoryId: 'animal',
+    uri: 'https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
+  {
+    id: 'animal-5',
+    title: 'Zirafah Tinggi',
+    categoryId: 'animal',
+    uri: 'https://images.unsplash.com/photo-1547721064-da6cfb341d50?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
 
   // Lain-lain
   {
@@ -158,6 +214,20 @@ export const PRESET_IMAGES: TracingImage[] = [
     title: 'Kapal Angkasa',
     categoryId: 'others',
     uri: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
+  {
+    id: 'others-4',
+    title: 'Basikal Vintaj',
+    categoryId: 'others',
+    uri: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800&auto=format&fit=crop&q=80',
+    aspectRatio: 1.0,
+  },
+  {
+    id: 'others-5',
+    title: 'Kamera Retro',
+    categoryId: 'others',
+    uri: 'https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&auto=format&fit=crop&q=80',
     aspectRatio: 1.0,
   },
 ];

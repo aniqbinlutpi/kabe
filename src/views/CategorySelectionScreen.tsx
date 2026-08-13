@@ -1,17 +1,25 @@
 import React from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { AppIcon } from '@/components/AppIcon';
 import { CategoryCard } from '@/components/CategoryCard';
+import { KabeLogo } from '@/components/KabeLogo';
 import { CATEGORIES } from '@/constants/PresetCategories';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
 
-import { KabeLogo } from '@/components/KabeLogo';
-
 interface CategorySelectionScreenProps {
   onSelectCategory: (category: CategoryItem) => void;
+  onSelectImage?: (image: TracingImage) => void;
   onOpenUploadModal: () => void;
   onOpenSettingsModal: () => void;
   customImages: TracingImage[];
@@ -22,6 +30,7 @@ interface CategorySelectionScreenProps {
 
 export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({
   onSelectCategory,
+  onSelectImage,
   onOpenUploadModal,
   onOpenSettingsModal,
   customImages,
@@ -29,15 +38,29 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
   language,
   themeMode,
 }) => {
-  const { columns, gap, paddingHorizontal, maxContainerWidth, cardHeight } =
-    useResponsiveLayout();
+  const { paddingHorizontal, maxContainerWidth } = useResponsiveLayout();
 
   const t = TRANSLATIONS[language];
   const colors = COLOR_THEMES[themeMode];
+  const isDark = themeMode === 'dark';
+
+  const row1Categories = CATEGORIES.slice(0, 3);
+  const row2Categories = CATEGORIES.slice(3, 6);
 
   const getCategoryCount = (categoryId: string) => {
     if (categoryId === 'uploads') return customImages.length;
     return allImages.filter((img) => img.categoryId === categoryId).length;
+  };
+
+  const getCategoryImages = (categoryId: string) => {
+    if (categoryId === 'uploads') return customImages;
+    return allImages.filter((img) => img.categoryId === categoryId);
+  };
+
+  const openGithub = () => {
+    Linking.openURL('https://github.com/aniqbinlutpi').catch((err) =>
+      console.warn('Failed to open URL:', err)
+    );
   };
 
   return (
@@ -62,14 +85,17 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
         </View>
       </Animated.View>
 
-      {/* Main Scrollable Content */}
+      {/* Main Content Area */}
       <ScrollView
         style={styles.scrollArea}
-        contentContainerStyle={[styles.scrollContent, { paddingHorizontal }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingHorizontal, minHeight: '92%' },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
-          {/* Animated Flat Editorial Hero Header */}
+          {/* Hero Section */}
           <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.flatHeroSection}>
             <Text
               style={[styles.heroTitle, { color: colors.textPrimary }]}
@@ -94,40 +120,100 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
           </Animated.View>
 
           {/* Section Heading */}
-          <Animated.View entering={FadeInDown.delay(180).duration(450)} style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-              {t.categoryTitle}
-            </Text>
-            <Text style={[styles.sectionSub, { color: colors.textSecondary }]}>
-              {t.categorySub}
-            </Text>
+          <Animated.View entering={FadeInDown.delay(180).duration(450)} style={styles.sectionHeaderRow}>
+            <View style={styles.sectionHeaderTitles}>
+              <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
+                {t.categoryTitle}
+              </Text>
+              <Text style={[styles.sectionSub, { color: colors.textSecondary }]}>
+                {t.categorySub}
+              </Text>
+            </View>
           </Animated.View>
 
-          {/* Dynamic Flat Category Grid */}
-          <View style={[styles.gridContainer, { gap }]}>
-            {CATEGORIES.map((cat, index) => {
-              const itemCount = getCategoryCount(cat.id);
-              const columnWidth = `${100 / columns - (gap * (columns - 1)) / columns}%` as any;
-
-              return (
-                <Animated.View
-                  key={cat.id}
-                  entering={FadeInUp.delay(220 + index * 50).springify().damping(16)}
-                  style={{ width: columnWidth }}
-                >
+          {/* 2-Row Horizontal Scrollable Grid with Right Edge Peek (matching sketch) */}
+          <Animated.View entering={FadeInUp.delay(220).springify().damping(16)} style={styles.gridContainer}>
+            {/* Row 1 Horizontal Carousel */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              decelerationRate="fast"
+              snapToInterval={292}
+              snapToAlignment="start"
+              contentContainerStyle={styles.horizontalRowContent}
+            >
+              {row1Categories.map((cat) => (
+                <View key={cat.id} style={styles.horizontalCardWrapper}>
                   <CategoryCard
                     category={cat}
-                    itemCount={itemCount}
+                    itemCount={getCategoryCount(cat.id)}
+                    categoryImages={getCategoryImages(cat.id)}
                     onPress={onSelectCategory}
-                    cardHeight={cardHeight}
+                    onSelectImage={onSelectImage}
+                    onOpenUploadModal={onOpenUploadModal}
+                    cardHeight={215}
                     language={language}
                     themeMode={themeMode}
                   />
-                </Animated.View>
-              );
-            })}
-          </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            {/* Row 2 Horizontal Carousel */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              decelerationRate="fast"
+              snapToInterval={292}
+              snapToAlignment="start"
+              contentContainerStyle={styles.horizontalRowContent}
+            >
+              {row2Categories.map((cat) => (
+                <View key={cat.id} style={styles.horizontalCardWrapper}>
+                  <CategoryCard
+                    category={cat}
+                    itemCount={getCategoryCount(cat.id)}
+                    categoryImages={getCategoryImages(cat.id)}
+                    onPress={onSelectCategory}
+                    onSelectImage={onSelectImage}
+                    onOpenUploadModal={onOpenUploadModal}
+                    cardHeight={215}
+                    language={language}
+                    themeMode={themeMode}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          </Animated.View>
         </View>
+
+        {/* Normal Bottom Footer */}
+        <Animated.View
+          entering={FadeInUp.delay(450).duration(450)}
+          style={[styles.footerContainer, { maxWidth: maxContainerWidth }]}
+        >
+          <View style={[styles.footerDivider, { backgroundColor: colors.cardBorder }]} />
+
+          <View style={styles.footerRow}>
+            <Text style={[styles.footerCopyrightText, { color: colors.textSecondary }]}>
+              © {new Date().getFullYear()} Kabe App. All rights reserved.
+            </Text>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.githubIconBtn,
+                {
+                  backgroundColor: isDark ? '#27272A' : '#F4F4F5',
+                  borderColor: colors.cardBorder,
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+              onPress={openGithub}
+            >
+              <AppIcon name="github" size={16} color={colors.textPrimary} />
+            </Pressable>
+          </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );
@@ -150,11 +236,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  brandTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    letterSpacing: -0.5,
-  },
   flatSettingsIconBtn: {
     padding: 6,
   },
@@ -162,16 +243,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingVertical: 20,
+    paddingVertical: 16,
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   innerContainer: {
     width: '100%',
-    gap: 24,
+    gap: 16,
   },
   flatHeroSection: {
-    gap: 10,
-    paddingVertical: 4,
+    gap: 8,
+    paddingVertical: 2,
   },
   heroTitle: {
     fontFamily: Platform.select({
@@ -199,17 +281,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
-    marginTop: 4,
+    marginTop: 2,
   },
   uploadHeaderText: {
     fontSize: 13,
     fontWeight: '800',
   },
-  sectionHeader: {
-    gap: 2,
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderTopWidth: 1,
     borderTopColor: '#E4E4E7',
-    paddingTop: 16,
+    paddingTop: 14,
+  },
+  sectionHeaderTitles: {
+    gap: 2,
+    flex: 1,
   },
   sectionTitle: {
     fontSize: 18,
@@ -221,8 +309,42 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     width: '100%',
+    gap: 14,
+  },
+  horizontalRowContent: {
+    gap: 12,
+    paddingRight: 16,
+  },
+  horizontalCardWrapper: {
+    width: 280,
+  },
+  footerContainer: {
+    width: '100%',
+    marginTop: 24,
+    paddingBottom: 8,
+  },
+  footerDivider: {
+    height: 1,
+    width: '100%',
+    marginBottom: 14,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  footerCopyrightText: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  githubIconBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
