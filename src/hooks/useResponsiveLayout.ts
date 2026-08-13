@@ -31,7 +31,7 @@ export function useResponsiveLayout(): ResponsiveLayoutConfig {
   const gap = isTablet ? 20 : 12;
   const paddingHorizontal = isTablet ? 28 : 16;
   const maxContainerWidth = 1100;
-  const cardHeight = isTablet ? 180 : 155;
+  const cardHeight = isTablet ? 190 : 170;
 
   return {
     width,

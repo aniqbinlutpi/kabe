@@ -68,7 +68,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         style={[
           styles.cardContainer,
           {
-            minHeight: cardHeight,
+            height: cardHeight,
             backgroundColor: isDarkCard ? '#09090B' : colors.cardBackground,
             borderColor: isDarkCard ? '#27272A' : colors.cardBorder,
             shadowColor: themeMode === 'dark' ? '#000000' : '#09090B',
@@ -76,28 +76,28 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         ]}
       >
         <View style={styles.topSection}>
-          {badgeText ? (
-            <View
-              style={[
-                styles.badge,
-                {
-                  backgroundColor: isDarkCard ? '#27272A' : colors.buttonBackground,
-                  borderColor: isDarkCard ? '#3F3F46' : colors.buttonBorder,
-                },
-              ]}
-            >
-              <Text
+          <View style={styles.badgeWrapper}>
+            {badgeText ? (
+              <View
                 style={[
-                  styles.badgeText,
-                  { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+                  styles.badge,
+                  {
+                    backgroundColor: isDarkCard ? '#27272A' : colors.buttonBackground,
+                    borderColor: isDarkCard ? '#3F3F46' : colors.buttonBorder,
+                  },
                 ]}
               >
-                {badgeText}
-              </Text>
-            </View>
-          ) : (
-            <View style={styles.badgeSpacer} />
-          )}
+                <Text
+                  style={[
+                    styles.badgeText,
+                    { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+                  ]}
+                >
+                  {badgeText}
+                </Text>
+              </View>
+            ) : null}
+          </View>
 
           <Text
             style={[
@@ -119,19 +119,11 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         </View>
 
         {itemCount !== undefined && (
-          <View
-            style={[
-              styles.countTag,
-              {
-                backgroundColor: isDarkCard ? '#18181B' : colors.buttonBackground,
-                borderColor: isDarkCard ? '#27272A' : colors.buttonBorder,
-              },
-            ]}
-          >
+          <View style={styles.countTag}>
             <Text
               style={[
                 styles.countText,
-                { color: isDarkCard ? '#FFFFFF' : colors.textPrimary },
+                { color: isDarkCard ? '#A1A1AA' : colors.textSecondary },
               ]}
             >
               {itemCount} {t.imageCountUnit} →
@@ -160,15 +152,16 @@ const styles = StyleSheet.create({
   topSection: {
     gap: 4,
   },
-  badgeSpacer: {
-    height: 4,
+  badgeWrapper: {
+    height: 24,
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   badge: {
     alignSelf: 'flex-start',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
-    marginBottom: 4,
     borderWidth: 1,
   },
   badgeText: {
@@ -189,15 +182,11 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   countTag: {
-    alignSelf: 'flex-start',
+    alignSelf: 'flex-end',
     marginTop: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-    borderWidth: 1,
   },
   countText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
   },
 });

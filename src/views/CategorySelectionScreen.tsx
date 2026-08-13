@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { AppIcon } from '@/components/AppIcon';
 import { CategoryCard } from '@/components/CategoryCard';
@@ -71,7 +71,11 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
         <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
           {/* Animated Flat Editorial Hero Header */}
           <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.flatHeroSection}>
-            <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>
+            <Text
+              style={[styles.heroTitle, { color: colors.textPrimary }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+            >
               {t.heroTitle}
             </Text>
             <Text style={[styles.heroSub, { color: colors.textSecondary }]}>
@@ -170,10 +174,16 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   heroTitle: {
-    fontSize: 28,
-    fontWeight: '900',
-    letterSpacing: -0.8,
-    lineHeight: 34,
+    fontFamily: Platform.select({
+      ios: 'Chalkboard SE',
+      android: 'casual',
+      web: '"Patrick Hand", "Chalkboard SE", "Comic Sans MS", cursive, sans-serif',
+      default: 'cursive',
+    }),
+    fontSize: 24,
+    fontWeight: '600',
+    letterSpacing: -0.2,
+    lineHeight: 30,
   },
   heroSub: {
     fontSize: 14,
