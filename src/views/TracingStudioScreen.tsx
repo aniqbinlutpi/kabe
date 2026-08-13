@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Image,
   PanResponder,
@@ -12,7 +12,9 @@ import { AppIcon } from '@/components/AppIcon';
 import { TouchLockOverlay } from '@/components/TouchLockOverlay';
 import { TracingHeader } from '@/components/TracingHeader';
 import { TracingToolbar } from '@/components/TracingToolbar';
+import { TracingGuidedTourOverlay } from '@/components/TracingGuidedTourOverlay';
 import { Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
+import { StorageService } from '@/services/StorageService';
 import { TracingImage, TracingStudioConfig } from '@/types/TracingTypes';
 
 interface TracingStudioScreenProps {
@@ -46,6 +48,16 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
   const [config, setConfig] = useState<TracingStudioConfig>(DEFAULT_CONFIG);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isSelected, setIsSelected] = useState(true);
+  const [isWizardVisible, setIsWizardVisible] = useState(false);
+
+  useEffect(() => {
+    // Auto open wizard on initial entry if user hasn't opted out
+    StorageService.getHasSeenWizard().then((hasSeen) => {
+      if (!hasSeen) {
+        setIsWizardVisible(true);
+      }
+    });
+  }, []);
 
   const t = TRANSLATIONS[language];
 
@@ -221,6 +233,7 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
         }}
         onReset={handleReset}
         onOpenSettingsModal={onOpenSettingsModal}
+        onOpenWizard={() => setIsWizardVisible(true)}
         language={language}
         themeMode={themeMode}
       />
@@ -353,6 +366,23 @@ export const TracingStudioScreen: React.FC<TracingStudioScreenProps> = ({
         isLocked={config.isLocked}
         onUnlock={() => handleUpdateConfig({ isLocked: false })}
         language={language}
+      />
+
+      {/* Interactive Guided Tour & Spotlight Overlay */}
+      <TracingGuidedTourOverlay
+        visible={isWizardVisible}
+        onClose={() => setIsWizardVisible(false)}
+        brightness={config.brightness}
+        onChangeBrightness={(val) => handleUpdateConfig({ brightness: val })}
+        onLockAndStartTracing={() => {
+          handleUpdateConfig({ isLocked: true });
+          setIsSelected(false);
+        }}
+        onDontShowAgainToggle={(dontShow) => {
+          StorageService.saveHasSeenWizard(dontShow);
+        }}
+        language={language}
+        themeMode={themeMode}
       />
     </View>
   );

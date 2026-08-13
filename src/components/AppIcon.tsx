@@ -19,7 +19,10 @@ export type IconName =
   | 'check'
   | 'settings'
   | 'globe'
-  | 'github';
+  | 'github'
+  | 'help'
+  | 'sparkles'
+  | 'paper';
 
 interface AppIconProps {
   name: IconName;
@@ -473,6 +476,45 @@ export const AppIcon: React.FC<AppIconProps> = ({
           />
         </View>
       );
+
+    case 'help': {
+      const svgDataUri = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${encodeURIComponent(color)}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;
+      return (
+        <View style={[styles.box, { width: size, height: size }]}>
+          <Image
+            source={{ uri: svgDataUri }}
+            style={{ width: size, height: size }}
+            contentFit="contain"
+          />
+        </View>
+      );
+    }
+
+    case 'sparkles': {
+      const svgDataUri = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${encodeURIComponent(color)}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>`;
+      return (
+        <View style={[styles.box, { width: size, height: size }]}>
+          <Image
+            source={{ uri: svgDataUri }}
+            style={{ width: size, height: size }}
+            contentFit="contain"
+          />
+        </View>
+      );
+    }
+
+    case 'paper': {
+      const svgDataUri = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${encodeURIComponent(color)}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg>`;
+      return (
+        <View style={[styles.box, { width: size, height: size }]}>
+          <Image
+            source={{ uri: svgDataUri }}
+            style={{ width: size, height: size }}
+            contentFit="contain"
+          />
+        </View>
+      );
+    }
 
     default:
       return null;

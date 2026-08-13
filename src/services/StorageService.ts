@@ -6,6 +6,7 @@ import { TracingImage } from '@/types/TracingTypes';
 const UPLOADED_IMAGES_KEY = 'ketah_kabe_custom_images_v4';
 const LANGUAGE_KEY = 'ketah_kabe_language_v4';
 const THEME_KEY = 'ketah_kabe_theme_v4';
+const HAS_SEEN_WIZARD_KEY = 'ketah_kabe_wizard_seen_v1';
 
 const memoryStorage: Record<string, string> = {};
 
@@ -130,6 +131,23 @@ export const StorageService = {
       await setItemSafe(THEME_KEY, theme);
     } catch (e) {
       console.warn('Failed to save theme mode:', e);
+    }
+  },
+
+  async getHasSeenWizard(): Promise<boolean> {
+    try {
+      const val = await getItemSafe(HAS_SEEN_WIZARD_KEY);
+      return val === 'true';
+    } catch (e) {
+      return false;
+    }
+  },
+
+  async saveHasSeenWizard(seen: boolean): Promise<void> {
+    try {
+      await setItemSafe(HAS_SEEN_WIZARD_KEY, seen ? 'true' : 'false');
+    } catch (e) {
+      console.warn('Failed to save wizard seen state:', e);
     }
   },
 };

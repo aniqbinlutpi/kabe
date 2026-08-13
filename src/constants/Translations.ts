@@ -62,6 +62,26 @@ export interface TranslationSchema {
   themeLight: string;
   themeDark: string;
   close: string;
+
+  // Tracing Wizard
+  wizardGuideBtn: string;
+  wizardTitle: string;
+  wizardStepCount: string;
+  wizardStep1Title: string;
+  wizardStep1Desc: string;
+  wizardStep1BtnMax: string;
+  wizardStep2Title: string;
+  wizardStep2Desc: string;
+  wizardStep3Title: string;
+  wizardStep3Desc: string;
+  wizardStep4Title: string;
+  wizardStep4Desc: string;
+  wizardLockAndStart: string;
+  wizardNext: string;
+  wizardPrev: string;
+  wizardSkip: string;
+  wizardDontShowAgain: string;
+  wizardPencilTip: string;
 }
 
 export const TRANSLATIONS: Record<Language, TranslationSchema> = {
@@ -120,6 +140,25 @@ export const TRANSLATIONS: Record<Language, TranslationSchema> = {
     themeLight: 'Cerah (Light)',
     themeDark: 'Gelap (Dark)',
     close: 'Tutup',
+
+    wizardGuideBtn: 'Panduan',
+    wizardTitle: 'Panduan Tekap Lukisan',
+    wizardStepCount: 'LANGKAH',
+    wizardStep1Title: '1. Terangkan Kecerahan Skrin',
+    wizardStep1Desc: 'Tingkatkan kecerahan skrin peranti anda ke tahap maksimum (100%) supaya garisan lukisan jelas menembusi kertas.',
+    wizardStep1BtnMax: 'Set 100% Kecerahan',
+    wizardStep2Title: '2. Selaraskan Lukisan Anda',
+    wizardStep2Desc: 'Gunakan 2 jari untuk zoom, rotate 360°, atau seret gambar mengikut saiz kertas lukisan anda.',
+    wizardStep3Title: '3. Letak Kertas Atas Skrin',
+    wizardStep3Desc: 'Letakkan kertas lukisan / A4 nipis di atas skrin peranti. Gunakan pensel lembut (HB / 2B) supaya skrin tidak tercalar.',
+    wizardStep4Title: '4. Kunci Skrin & Mula Tekap',
+    wizardStep4Desc: 'Kunci skrin supaya sentuhan kertas tidak menggerakkan gambar. Tekan & tahan 2 saat pada butang kunci untuk buka semula.',
+    wizardLockAndStart: 'Kunci Skrin & Mula Tekap',
+    wizardNext: 'Seterusnya',
+    wizardPrev: 'Kembali',
+    wizardSkip: 'Lompat',
+    wizardDontShowAgain: 'Jangan tunjuk panduan ini lagi',
+    wizardPencilTip: '✏️ Pensel Lembut 2B / HB',
   },
   en: {
     appTag: 'KETAH KABE TRACING',
@@ -176,6 +215,25 @@ export const TRANSLATIONS: Record<Language, TranslationSchema> = {
     themeLight: 'Light Mode',
     themeDark: 'Dark Mode',
     close: 'Close',
+
+    wizardGuideBtn: 'Guide',
+    wizardTitle: 'Paper Tracing Setup Guide',
+    wizardStepCount: 'STEP',
+    wizardStep1Title: '1. Maximize Screen Brightness',
+    wizardStep1Desc: 'Set screen brightness to 100% so the lines shine clearly through paper.',
+    wizardStep1BtnMax: 'Set 100% Brightness',
+    wizardStep2Title: '2. Adjust & Position Artwork',
+    wizardStep2Desc: 'Pinch with 2 fingers to zoom, rotate 360°, or drag the artwork to align with your paper.',
+    wizardStep3Title: '3. Place Paper On Screen',
+    wizardStep3Desc: 'Place tracing paper or thin A4 paper over the screen. Use a soft pencil (HB / 2B) to protect the display.',
+    wizardStep4Title: '4. Lock Screen & Start Tracing',
+    wizardStep4Desc: 'Lock touch controls so physical paper touches won’t move the image. Press & hold for 2s to unlock anytime.',
+    wizardLockAndStart: 'Lock Screen & Start Tracing',
+    wizardNext: 'Next',
+    wizardPrev: 'Back',
+    wizardSkip: 'Skip',
+    wizardDontShowAgain: "Don't auto-show this guide again",
+    wizardPencilTip: '✏️ Soft Pencil 2B / HB',
   },
 };
 

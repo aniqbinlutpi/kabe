@@ -11,6 +11,7 @@ interface TracingHeaderProps {
   onToggleLock: () => void;
   onReset: () => void;
   onOpenSettingsModal?: () => void;
+  onOpenWizard?: () => void;
   language?: Language;
   themeMode?: ThemeMode;
 }
@@ -22,6 +23,7 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
   onToggleLock,
   onReset,
   onOpenSettingsModal,
+  onOpenWizard,
   language = 'bm',
   themeMode = 'light',
 }) => {
@@ -55,6 +57,18 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
       </Text>
 
       <View style={styles.rightActions}>
+        {onOpenWizard && (
+          <TouchableOpacity
+            style={styles.flatIconBtnOnly}
+            onPress={() => {
+              SoundService.playPop();
+              onOpenWizard();
+            }}
+          >
+            <AppIcon name="help" size={18} color={colors.textPrimary} />
+          </TouchableOpacity>
+        )}
+
         {onOpenSettingsModal && (
           <TouchableOpacity
             style={styles.flatIconBtnOnly}
@@ -63,30 +77,28 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
               onOpenSettingsModal();
             }}
           >
-            <AppIcon name="settings" size={16} color={colors.textPrimary} />
+            <AppIcon name="settings" size={18} color={colors.textPrimary} />
           </TouchableOpacity>
         )}
 
         <TouchableOpacity
-          style={styles.flatTextBtn}
+          style={styles.flatIconBtnOnly}
           onPress={() => {
             SoundService.playClick();
             onReset();
           }}
         >
-          <AppIcon name="reset" size={14} color={colors.textPrimary} />
-          <Text style={[styles.resetText, { color: colors.textPrimary }]}>{t.reset}</Text>
+          <AppIcon name="reset" size={18} color={colors.textPrimary} />
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.lockButton, { backgroundColor: colors.darkButtonBackground }]}
+          style={[styles.lockIconButton, { backgroundColor: colors.darkButtonBackground }]}
           onPress={() => {
             SoundService.playPop();
             onToggleLock();
           }}
         >
-          <AppIcon name="lock" size={12} color={colors.darkButtonText} />
-          <Text style={[styles.lockText, { color: colors.darkButtonText }]}>{t.lockScreen}</Text>
+          <AppIcon name="lock" size={16} color={colors.darkButtonText} />
         </TouchableOpacity>
       </View>
     </View>
@@ -123,29 +135,16 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   flatIconBtnOnly: {
-    padding: 6,
-  },
-  flatTextBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-  },
-  resetText: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  lockButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    padding: 8,
     borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  lockText: {
-    fontSize: 12,
-    fontWeight: '800',
+  lockIconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
