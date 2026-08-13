@@ -201,16 +201,13 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
 
             <Pressable
               style={({ pressed }) => [
-                styles.githubIconBtn,
-                {
-                  backgroundColor: isDark ? '#27272A' : '#F4F4F5',
-                  borderColor: colors.cardBorder,
-                  opacity: pressed ? 0.7 : 1,
-                },
+                styles.githubIconButton,
+                { opacity: pressed ? 0.6 : 1 },
               ]}
               onPress={openGithub}
+              hitSlop={8}
             >
-              <AppIcon name="github" size={16} color={colors.textPrimary} />
+              <AppIcon name="github" size={20} color={colors.textPrimary} />
             </Pressable>
           </View>
         </Animated.View>
@@ -339,12 +336,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '400',
   },
-  githubIconBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1,
-    alignItems: 'center',
+  githubIconButton: {
+    padding: 4,
     justifyContent: 'center',
+    alignItems: 'center',
   },
 });
