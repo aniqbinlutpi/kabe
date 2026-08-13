@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { AppIcon } from '@/components/AppIcon';
 import { ImageGridCard } from '@/components/ImageGridCard';
@@ -146,7 +146,22 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
                       }}
                       onDelete={(id) => {
                         SoundService.playClick();
-                        if (onDeleteImage) onDeleteImage(id);
+                        Alert.alert(
+                          language === 'en' ? 'Delete Image' : 'Padam Gambar',
+                          language === 'en'
+                            ? 'Are you sure you want to delete this uploaded image?'
+                            : 'Adakah anda pasti ingin memadam gambar muat naik ini?',
+                          [
+                            { text: language === 'en' ? 'Cancel' : 'Batal', style: 'cancel' },
+                            {
+                              text: language === 'en' ? 'Delete' : 'Padam',
+                              style: 'destructive',
+                              onPress: () => {
+                                if (onDeleteImage) onDeleteImage(id);
+                              },
+                            },
+                          ]
+                        );
                       }}
                       themeMode={themeMode}
                     />

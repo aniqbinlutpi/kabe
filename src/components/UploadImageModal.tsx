@@ -12,14 +12,37 @@ import * as ImagePicker from 'expo-image-picker';
 import { AppIcon } from '@/components/AppIcon';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 
-import { convertUriToBase64 } from '@/services/StorageService';
-
 interface UploadImageModalProps {
   visible: boolean;
   onClose: () => void;
   onImageUploaded: (title: string, uri: string) => void;
   language?: Language;
   themeMode?: ThemeMode;
+}
+
+async function ensureBase64Uri(uri: string): Promise<string> {
+  if (!uri) return uri;
+  if (uri.startsWith('data:') || uri.startsWith('http://') || uri.startsWith('https://')) {
+    return uri;
+  }
+  try {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          resolve(reader.result);
+        } else {
+          resolve(uri);
+        }
+      };
+      reader.onerror = () => resolve(uri);
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    return uri;
+  }
 }
 
 export const UploadImageModal: React.FC<UploadImageModalProps> = ({
@@ -48,20 +71,20 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
-        quality: 0.7,
+        quality: 0.5,
         base64: true,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
-        let persistentUri = asset.uri;
+        let uri = asset.uri;
         if (asset.base64) {
           const mimeType = asset.mimeType || 'image/jpeg';
-          persistentUri = `data:${mimeType};base64,${asset.base64}`;
+          uri = `data:${mimeType};base64,${asset.base64}`;
         } else {
-          persistentUri = await convertUriToBase64(asset.uri);
+          uri = await ensureBase64Uri(asset.uri);
         }
-        setSelectedUri(persistentUri);
+        setSelectedUri(uri);
       }
     } catch (e) {
       console.warn('Error launching image picker:', e);
@@ -90,7 +113,7 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
       return;
     }
 
-    const finalUri = await convertUriToBase64(rawUri);
+    const finalUri = await ensureBase64Uri(rawUri);
     onImageUploaded(finalTitle, finalUri);
     // Reset state
     setTitle('');

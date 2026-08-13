@@ -1,66 +1,56 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { File, Paths } from 'expo-file-system';
+import { Platform } from 'react-native';
 import { Language, ThemeMode } from '@/constants/Translations';
 import { TracingImage } from '@/types/TracingTypes';
 
-const UPLOADED_IMAGES_KEY = '@ketah_kabe_custom_images_v1';
-const LANGUAGE_KEY = '@ketah_kabe_language_v1';
-const THEME_KEY = '@ketah_kabe_theme_v1';
+const UPLOADED_IMAGES_KEY = 'ketah_kabe_custom_images_v4';
+const LANGUAGE_KEY = 'ketah_kabe_language_v4';
+const THEME_KEY = 'ketah_kabe_theme_v4';
 
-// In-memory fallback if AsyncStorage native module is null or fails
 const memoryStorage: Record<string, string> = {};
 
 async function getItemSafe(key: string): Promise<string | null> {
-  try {
-    const val = await AsyncStorage.getItem(key);
-    if (val !== null) return val;
-  } catch (e) {
+  // 1. Try reading from permanent disk FileSystem on native mobile
+  if (Platform.OS !== 'web' && File && Paths) {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        return window.localStorage.getItem(key);
+      const sanitizedKey = key.replace(/[^a-zA-Z0-9_]/g, '_');
+      const file = new File(Paths.document, `${sanitizedKey}.json`);
+      if (file.exists) {
+        return await file.text();
       }
-    } catch (err) {}
+    } catch (e) {}
   }
+
+  // 2. Web localStorage fallback
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key);
+    }
+  } catch (err) {}
+
   return memoryStorage[key] || null;
 }
 
 async function setItemSafe(key: string, value: string): Promise<void> {
-  try {
-    await AsyncStorage.setItem(key, value);
-    return;
-  } catch (e) {
+  // 1. Try writing to permanent disk FileSystem on native mobile
+  if (Platform.OS !== 'web' && File && Paths) {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem(key, value);
-        return;
-      }
-    } catch (err) {}
+      const sanitizedKey = key.replace(/[^a-zA-Z0-9_]/g, '_');
+      const file = new File(Paths.document, `${sanitizedKey}.json`);
+      await file.write(value);
+      return;
+    } catch (e) {}
   }
-  memoryStorage[key] = value;
-}
 
-export async function convertUriToBase64(uri: string): Promise<string> {
-  if (!uri) return uri;
-  if (uri.startsWith('data:')) return uri;
-
+  // 2. Web localStorage fallback
   try {
-    const response = await fetch(uri);
-    const blob = await response.blob();
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
-          resolve(reader.result);
-        } else {
-          resolve(uri);
-        }
-      };
-      reader.onerror = () => resolve(uri);
-      reader.readAsDataURL(blob);
-    });
-  } catch (e) {
-    console.warn('Failed to convert URI to Base64:', e);
-    return uri;
-  }
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+      return;
+    }
+  } catch (err) {}
+
+  memoryStorage[key] = value;
 }
 
 export const StorageService = {
@@ -78,10 +68,8 @@ export const StorageService = {
   },
 
   async saveCustomImage(image: Omit<TracingImage, 'id' | 'addedAt' | 'categoryId' | 'isCustom'>): Promise<TracingImage> {
-    const persistentUri = await convertUriToBase64(image.uri);
     const newImage: TracingImage = {
       ...image,
-      uri: persistentUri,
       id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
       categoryId: 'uploads',
       isCustom: true,

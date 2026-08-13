@@ -69,7 +69,7 @@ export const ImageGridCard: React.FC<ImageGridCardProps> = ({
                 onDelete(image.id);
               }}
             >
-              <AppIcon name="close" size={10} color="#FFFFFF" />
+              <AppIcon name="trash" size={12} color="#EF4444" />
             </Pressable>
           )}
         </View>
