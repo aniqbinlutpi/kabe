@@ -12,6 +12,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { AppIcon } from '@/components/AppIcon';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 
+import { convertUriToBase64 } from '@/services/StorageService';
+
 interface UploadImageModalProps {
   visible: boolean;
   onClose: () => void;
@@ -46,11 +48,20 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
-        quality: 0.9,
+        quality: 0.7,
+        base64: true,
       });
 
       if (!result.canceled && result.assets && result.assets.length > 0) {
-        setSelectedUri(result.assets[0].uri);
+        const asset = result.assets[0];
+        let persistentUri = asset.uri;
+        if (asset.base64) {
+          const mimeType = asset.mimeType || 'image/jpeg';
+          persistentUri = `data:${mimeType};base64,${asset.base64}`;
+        } else {
+          persistentUri = await convertUriToBase64(asset.uri);
+        }
+        setSelectedUri(persistentUri);
       }
     } catch (e) {
       console.warn('Error launching image picker:', e);
@@ -70,15 +81,16 @@ export const UploadImageModal: React.FC<UploadImageModalProps> = ({
     }
   };
 
-  const handleSubmit = () => {
-    const finalUri = useUrl ? urlInput.trim() : selectedUri;
+  const handleSubmit = async () => {
+    const rawUri = useUrl ? urlInput.trim() : selectedUri;
     const finalTitle = title.trim() || 'My Drawing';
 
-    if (!finalUri) {
+    if (!rawUri) {
       alert(t.alertSelectImage);
       return;
     }
 
+    const finalUri = await convertUriToBase64(rawUri);
     onImageUploaded(finalTitle, finalUri);
     // Reset state
     setTitle('');

@@ -15,6 +15,7 @@ import { KabeLogo } from '@/components/KabeLogo';
 import { CATEGORIES } from '@/constants/PresetCategories';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
+import { SoundService } from '@/services/SoundService';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
 
 interface CategorySelectionScreenProps {
@@ -58,6 +59,7 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
   };
 
   const openGithub = () => {
+    SoundService.playPop();
     Linking.openURL('https://github.com/aniqbinlutpi').catch((err) =>
       console.warn('Failed to open URL:', err)
     );
@@ -79,7 +81,13 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
         <View style={[styles.stickyHeaderContent, { maxWidth: maxContainerWidth, paddingHorizontal }]}>
           <KabeLogo textColor={colors.textPrimary} size="md" />
 
-          <Pressable style={styles.flatSettingsIconBtn} onPress={onOpenSettingsModal}>
+          <Pressable 
+            style={styles.flatSettingsIconBtn} 
+            onPress={() => {
+              SoundService.playPop();
+              onOpenSettingsModal();
+            }}
+          >
             <AppIcon name="settings" size={18} color={colors.textPrimary} />
           </Pressable>
         </View>
@@ -110,7 +118,10 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
 
             <Pressable
               style={[styles.uploadHeaderBtn, { backgroundColor: colors.darkButtonBackground }]}
-              onPress={onOpenUploadModal}
+              onPress={() => {
+                SoundService.playPop();
+                onOpenUploadModal();
+              }}
             >
               <AppIcon name="plus" size={14} color={colors.darkButtonText} />
               <Text style={[styles.uploadHeaderText, { color: colors.darkButtonText }]}>

@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AppIcon } from '@/components/AppIcon';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
+import { SoundService } from '@/services/SoundService';
 
 interface TracingHeaderProps {
   title: string;
@@ -39,7 +40,13 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
       ]}
     >
       {/* Flat Back Arrow Icon Only (No Text Wording) */}
-      <TouchableOpacity style={styles.flatIconButton} onPress={onBack}>
+      <TouchableOpacity
+        style={styles.flatIconButton}
+        onPress={() => {
+          SoundService.playClick();
+          onBack();
+        }}
+      >
         <AppIcon name="arrow-left" size={18} color={colors.textPrimary} />
       </TouchableOpacity>
 
@@ -49,19 +56,34 @@ export const TracingHeader: React.FC<TracingHeaderProps> = ({
 
       <View style={styles.rightActions}>
         {onOpenSettingsModal && (
-          <TouchableOpacity style={styles.flatIconBtnOnly} onPress={onOpenSettingsModal}>
+          <TouchableOpacity
+            style={styles.flatIconBtnOnly}
+            onPress={() => {
+              SoundService.playPop();
+              onOpenSettingsModal();
+            }}
+          >
             <AppIcon name="settings" size={16} color={colors.textPrimary} />
           </TouchableOpacity>
         )}
 
-        <TouchableOpacity style={styles.flatTextBtn} onPress={onReset}>
+        <TouchableOpacity
+          style={styles.flatTextBtn}
+          onPress={() => {
+            SoundService.playClick();
+            onReset();
+          }}
+        >
           <AppIcon name="reset" size={14} color={colors.textPrimary} />
           <Text style={[styles.resetText, { color: colors.textPrimary }]}>{t.reset}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.lockButton, { backgroundColor: colors.darkButtonBackground }]}
-          onPress={onToggleLock}
+          onPress={() => {
+            SoundService.playPop();
+            onToggleLock();
+          }}
         >
           <AppIcon name="lock" size={12} color={colors.darkButtonText} />
           <Text style={[styles.lockText, { color: colors.darkButtonText }]}>{t.lockScreen}</Text>

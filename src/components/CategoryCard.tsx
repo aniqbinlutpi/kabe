@@ -4,6 +4,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { Image } from 'expo-image';
 import { AppIcon } from '@/components/AppIcon';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
+import { SoundService } from '@/services/SoundService';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
 
 interface CategoryCardProps {
@@ -72,7 +73,10 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       <Pressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        onPress={() => onPress(category)}
+        onPress={() => {
+          SoundService.playPop();
+          onPress(category);
+        }}
         style={[
           styles.cardContainer,
           {
@@ -139,11 +143,8 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                   ]}
                   onPress={(e) => {
                     e.stopPropagation();
-                    if (onSelectImage) {
-                      onSelectImage(img);
-                    } else {
-                      onPress(category);
-                    }
+                    SoundService.playPop();
+                    onPress(category);
                   }}
                 >
                   <Image
@@ -171,6 +172,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
                 ]}
                 onPress={(e) => {
                   e.stopPropagation();
+                  SoundService.playPop();
                   if (category.id === 'uploads' && onOpenUploadModal) {
                     onOpenUploadModal();
                   } else {
@@ -197,6 +199,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
             ]}
             onPress={(e) => {
               e.stopPropagation();
+              SoundService.playPop();
               onPress(category);
             }}
           >

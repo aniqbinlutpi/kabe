@@ -2,6 +2,7 @@ import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AppIcon } from '@/components/AppIcon';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
+import { SoundService } from '@/services/SoundService';
 import { FilterMode, TracingStudioConfig } from '@/types/TracingTypes';
 
 interface TracingToolbarProps {
@@ -49,7 +50,10 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
                 styles.toolBtn,
                 { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
               ]}
-              onPress={() => onChangeConfig({ scale: Math.max(0.2, config.scale - 0.2) })}
+              onPress={() => {
+                SoundService.playClick();
+                onChangeConfig({ scale: Math.max(0.2, config.scale - 0.2) });
+              }}
             >
               <Text style={[styles.toolBtnText, { color: colors.textPrimary }]}>−</Text>
             </TouchableOpacity>
@@ -63,7 +67,10 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
                 styles.toolBtn,
                 { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
               ]}
-              onPress={() => onChangeConfig({ scale: Math.min(6.0, config.scale + 0.2) })}
+              onPress={() => {
+                SoundService.playClick();
+                onChangeConfig({ scale: Math.min(6.0, config.scale + 0.2) });
+              }}
             >
               <Text style={[styles.toolBtnText, { color: colors.textPrimary }]}>+</Text>
             </TouchableOpacity>
@@ -79,7 +86,10 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
                 styles.toolBtn,
                 { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
               ]}
-              onPress={() => onChangeConfig({ rotation: (config.rotation + 90) % 360 })}
+              onPress={() => {
+                SoundService.playClick();
+                onChangeConfig({ rotation: (config.rotation + 90) % 360 });
+              }}
             >
               <AppIcon name="reset" size={12} color={colors.textPrimary} />
               <Text style={[styles.toolBtnText, { color: colors.textPrimary }]}>{t.rotateStep}</Text>
@@ -94,7 +104,10 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
                   borderColor: colors.darkButtonBackground,
                 },
               ]}
-              onPress={() => onChangeConfig({ flipHorizontal: !config.flipHorizontal })}
+              onPress={() => {
+                SoundService.playClick();
+                onChangeConfig({ flipHorizontal: !config.flipHorizontal });
+              }}
             >
               <AppIcon
                 name="flip"
@@ -122,7 +135,10 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
                 styles.toolBtn,
                 { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
               ]}
-              onPress={() => onChangeConfig({ brightness: Math.max(0.3, config.brightness - 0.2) })}
+              onPress={() => {
+                SoundService.playClick();
+                onChangeConfig({ brightness: Math.max(0.3, config.brightness - 0.2) });
+              }}
             >
               <AppIcon name="moon" size={13} color={colors.textPrimary} />
             </TouchableOpacity>
@@ -136,7 +152,10 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
                 styles.toolBtn,
                 { backgroundColor: colors.buttonBackground, borderColor: colors.buttonBorder },
               ]}
-              onPress={() => onChangeConfig({ brightness: Math.min(2.0, config.brightness + 0.2) })}
+              onPress={() => {
+                SoundService.playClick();
+                onChangeConfig({ brightness: Math.min(2.0, config.brightness + 0.2) });
+              }}
             >
               <AppIcon name="sun" size={13} color={colors.textPrimary} />
             </TouchableOpacity>
@@ -160,7 +179,10 @@ export const TracingToolbar: React.FC<TracingToolbarProps> = ({
                       borderColor: colors.darkButtonBackground,
                     },
                   ]}
-                  onPress={() => onChangeConfig({ filterMode: f.id })}
+                  onPress={() => {
+                    SoundService.playPop();
+                    onChangeConfig({ filterMode: f.id });
+                  }}
                 >
                   <Text
                     style={[

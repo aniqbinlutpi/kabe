@@ -5,6 +5,7 @@ import { AppIcon } from '@/components/AppIcon';
 import { ImageGridCard } from '@/components/ImageGridCard';
 import { COLOR_THEMES, Language, ThemeMode, TRANSLATIONS } from '@/constants/Translations';
 import { useResponsiveLayout } from '@/hooks/useResponsiveLayout';
+import { SoundService } from '@/services/SoundService';
 import { CategoryItem, TracingImage } from '@/types/TracingTypes';
 
 interface ImageGalleryScreenProps {
@@ -54,7 +55,13 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
         ]}
       >
         {/* Flat Back Icon Button Only (No Text Wording) */}
-        <Pressable style={styles.flatBackBtn} onPress={onBack}>
+        <Pressable
+          style={styles.flatBackBtn}
+          onPress={() => {
+            SoundService.playClick();
+            onBack();
+          }}
+        >
           <AppIcon name="arrow-left" size={18} color={colors.textPrimary} />
         </Pressable>
 
@@ -68,13 +75,22 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
         </View>
 
         <View style={styles.rightNavActions}>
-          <Pressable style={styles.flatSettingsBtn} onPress={onOpenSettingsModal}>
+          <Pressable
+            style={styles.flatSettingsBtn}
+            onPress={() => {
+              SoundService.playPop();
+              onOpenSettingsModal();
+            }}
+          >
             <AppIcon name="settings" size={18} color={colors.textPrimary} />
           </Pressable>
 
           <Pressable
             style={[styles.uploadBtn, { backgroundColor: colors.darkButtonBackground }]}
-            onPress={onOpenUploadModal}
+            onPress={() => {
+              SoundService.playPop();
+              onOpenUploadModal();
+            }}
           >
             <AppIcon name="plus" size={14} color={colors.darkButtonText} />
             <Text style={[styles.uploadText, { color: colors.darkButtonText }]}>
@@ -101,7 +117,10 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
               </Text>
               <Pressable
                 style={[styles.emptyUploadBtn, { backgroundColor: colors.darkButtonBackground }]}
-                onPress={onOpenUploadModal}
+                onPress={() => {
+                  SoundService.playPop();
+                  onOpenUploadModal();
+                }}
               >
                 <AppIcon name="plus" size={14} color={colors.darkButtonText} />
                 <Text style={[styles.emptyUploadText, { color: colors.darkButtonText }]}>
@@ -121,8 +140,14 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
                   >
                     <ImageGridCard
                       image={img}
-                      onSelect={onSelectImage}
-                      onDelete={onDeleteImage}
+                      onSelect={(selected) => {
+                        SoundService.playSelect();
+                        onSelectImage(selected);
+                      }}
+                      onDelete={(id) => {
+                        SoundService.playClick();
+                        if (onDeleteImage) onDeleteImage(id);
+                      }}
                       themeMode={themeMode}
                     />
                   </Animated.View>
