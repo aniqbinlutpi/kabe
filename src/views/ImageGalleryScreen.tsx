@@ -47,8 +47,7 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
   return (
     <View style={[styles.screenContainer, { backgroundColor: colors.background }]}>
       {/* Top Navbar */}
-      <Animated.View
-        entering={FadeInDown.duration(350)}
+      <View
         style={[
           styles.topNav,
           { backgroundColor: colors.background, borderBottomColor: colors.cardBorder },
@@ -98,7 +97,7 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
             </Text>
           </Pressable>
         </View>
-      </Animated.View>
+      </View>
 
       {/* Main Content */}
       <ScrollView
@@ -107,7 +106,7 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
       >
         <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
           {images.length === 0 ? (
-            <Animated.View entering={FadeInUp.duration(400)} style={styles.emptyContainer}>
+            <View style={styles.emptyContainer}>
               <AppIcon name="image" size={40} color={colors.textSecondary} />
               <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>
                 {t.noImagesTitle}
@@ -127,15 +126,14 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
                   {t.uploadNow}
                 </Text>
               </Pressable>
-            </Animated.View>
+            </View>
           ) : (
             <View style={[styles.gridContainer, { gap }]}>
               {images.map((img, index) => {
                 const columnWidth = `${100 / columns - (gap * (columns - 1)) / columns}%` as any;
                 return (
-                  <Animated.View
+                  <View
                     key={img.id}
-                    entering={FadeInUp.delay(100 + index * 50).springify().damping(15)}
                     style={{ width: columnWidth }}
                   >
                     <ImageGridCard
@@ -165,7 +163,7 @@ export const ImageGalleryScreen: React.FC<ImageGalleryScreenProps> = ({
                       }}
                       themeMode={themeMode}
                     />
-                  </Animated.View>
+                  </View>
                 );
               })}
             </View>

@@ -53,11 +53,14 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-# IDE & Editor files
+# IDE, AI & Tool files
 .idea/
+.claude/
+.gemini/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
 

@@ -68,8 +68,7 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
   return (
     <View style={[styles.screenContainer, { backgroundColor: colors.background }]}>
       {/* Sticky Top Header Bar */}
-      <Animated.View
-        entering={FadeInDown.duration(350)}
+      <View
         style={[
           styles.stickyHeader,
           {
@@ -91,7 +90,7 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
             <AppIcon name="settings" size={18} color={colors.textPrimary} />
           </Pressable>
         </View>
-      </Animated.View>
+      </View>
 
       {/* Main Content Area */}
       <ScrollView
@@ -104,7 +103,7 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
       >
         <View style={[styles.innerContainer, { maxWidth: maxContainerWidth }]}>
           {/* Hero Section */}
-          <Animated.View entering={FadeInDown.delay(100).duration(450)} style={styles.flatHeroSection}>
+          <View style={styles.flatHeroSection}>
             <Text
               style={[styles.heroTitle, { color: colors.textPrimary }]}
               numberOfLines={1}
@@ -128,10 +127,10 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
                 {t.uploadButton}
               </Text>
             </Pressable>
-          </Animated.View>
+          </View>
 
           {/* Section Heading */}
-          <Animated.View entering={FadeInDown.delay(180).duration(450)} style={styles.sectionHeaderRow}>
+          <View style={styles.sectionHeaderRow}>
             <View style={styles.sectionHeaderTitles}>
               <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
                 {t.categoryTitle}
@@ -140,10 +139,10 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
                 {t.categorySub}
               </Text>
             </View>
-          </Animated.View>
+          </View>
 
           {/* 2-Row Horizontal Scrollable Grid with Right Edge Peek (matching sketch) */}
-          <Animated.View entering={FadeInUp.delay(220).springify().damping(16)} style={styles.gridContainer}>
+          <View style={styles.gridContainer}>
             {/* Row 1 Horizontal Carousel */}
             <ScrollView
               horizontal
@@ -195,12 +194,11 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
                 </View>
               ))}
             </ScrollView>
-          </Animated.View>
+          </View>
         </View>
 
         {/* Normal Bottom Footer */}
-        <Animated.View
-          entering={FadeInUp.delay(450).duration(450)}
+        <View
           style={[styles.footerContainer, { maxWidth: maxContainerWidth }]}
         >
           <View style={[styles.footerDivider, { backgroundColor: colors.cardBorder }]} />
@@ -221,7 +219,7 @@ export const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = (
               <AppIcon name="github" size={20} color={colors.textPrimary} />
             </Pressable>
           </View>
-        </Animated.View>
+        </View>
       </ScrollView>
     </View>
   );

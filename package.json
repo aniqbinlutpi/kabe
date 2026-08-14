@@ -3,16 +3,13 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "dependencies": {
-    "@expo/ui": "~57.0.10",
     "@react-native-async-storage/async-storage": "^3.1.1",
     "expo": "~57.0.12",
     "expo-audio": "^57.0.3",
-    "expo-av": "^16.0.8",
     "expo-constants": "~57.0.10",
     "expo-device": "~57.0.1",
     "expo-file-system": "^57.0.2",
     "expo-font": "~57.0.1",
-    "expo-glass-effect": "~57.0.1",
     "expo-haptics": "^57.0.1",
     "expo-image": "~57.0.2",
     "expo-image-picker": "^57.0.9",
@@ -20,7 +17,6 @@
     "expo-router": "~57.0.12",
     "expo-splash-screen": "~57.0.6",
     "expo-status-bar": "~57.0.1",
-    "expo-symbols": "~57.0.2",
     "expo-system-ui": "~57.0.2",
     "expo-video": "~57.0.2",
     "expo-web-browser": "~57.0.2",
@@ -31,8 +27,7 @@
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
-    "react-native-web": "~0.21.0",
-    "react-native-worklets": "0.10.1"
+    "react-native-web": "~0.21.0"
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
@@ -43,8 +38,8 @@
     "dev": "expo start",
     "typecheck": "tsc --noEmit",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint"
   },
